@@ -71,5 +71,67 @@ La ejecución de `find target -maxdepth 2 -type f | sort` sí devuelve lo que de
 
 ![img](img/4.png)
 
+## 06 - Añadir y utilizar una dependencia
+
+Editamos el `pom.xml` por primera vez para agregar una dependencia, para ver su correcto funcionamiento editamos también el `Main.java`
+
+Como resultado debería aparecer el siguiente mensaje:
+
+![img](img/5.png)
+
+## 07 - Maven central y repo local
+
+Tras insertar el dependency del anterior ejercicio podemos ver cómo se han creado unas carpetas siguiendo las etiquetas del XML, donde `groupId`, `artifactId` y `version` son ahora directorios.
+
+También se debe recalcar que de esta forma, con `mvn install` copias tu proyecto a tu propio repo, por eso nadie más puede verlo.
+
+![img](img/6.png)
+
+## 08 - Repositorios externos y settings.xml
+
+Tras seguir con los ejercicios, pasamos a crear una carpeta config, que será como un perfil con configuraciones de entorno.
+
+Notable en este apartado que con `-P`, el perfil se activa y Maven añade el repositorio central-explicito a su lista de repos. Sin `-P`, el archivo se carga pero el perfil está inactivo, así que ese repo no existe para Maven.
+
+![img](img/7.png)
+
+## 09 - Repositorios privados, mirrors y proxy
+Como no tengo una cuenta autorizada y un Nexus o un Artifactory dejaré este ejercicio como un análisis.
+
+Mirror: empresa. URL: https://repo.empresa.example/repository/maven-public/ (sin servicio disponible).
+`mirrorOf=*` redirige todas las peticiones al mirror. Las credenciales se asocian porque el `<server><id>` coincide con el `<mirror><id>`, y se leen de las variables de entorno `MAVEN_REPO_USER` y `MAVEN_REPO_TOKEN`, así no hay secretos en el archivo.
+
+## 10 - Profiles: activar configuraciones de Maven
+
+En este apartado aprendemos a activar perfiles que ya sabíamos crear en el apartado 08.
+
+Primero insertamos el fragmento de activación en el profile "informe"
+```xml
+<id>informe</id>
+  <activation>
+    <property>
+      <name>informe</name>
+      <value>true</value>
+    </property>
+  </activation>
+```
+Justo debajo del id, de esta forma podremos activarlo con `mvn -Dinforme=true help:active-profiles`
+
+![img](img/8.png)
+
+## 11 - Dependencias transitivas, scopes y conflictos
+
+Ahora aprendemos a "manejar" o más bien entender conflictos entre scopes de maven. En la imagen vemos cómo silencio un aviso del `commons-lang3` con el exclusions en el pom.xml y la salida al ejecutar `mvn dependency:tree -Dverbose -Dincludes=org.apache.commons`
+
+![img](img/9.png)
+
+## 12 - Propiedades y gestión de versiones
+
+
+
 ## Problemas encontrados
 - Durante la configuración de la máquina virtual me topé con barreras como arreglar los permisos de usuario, que gracias a los conocimientos del año pasado pude resolver de la manera adecuada con `su` y editando el archivo `sudoers` en la ruta `/etc/sudoers`
+
+
+- No pude instalar la versión de Java 17 para el ejercicio, aunque investigué al respecto no tuve tiempo suficiente para solucionarlo. Como el objetivo de instalar Java 17 era el de entender qué papel desempeña el `pom.xml` en el fijado de las versiones, considero que aprendí lo que tenía que aprender.
+**NOTA**: Pude solucionarlo, el problema era el `javac`, que al parecer no tenía ninguno instalado estaba dando problemas, pero me di cuenta muy tarde para llevarlo a cabo y sacar capturas (falta de tiempo).
