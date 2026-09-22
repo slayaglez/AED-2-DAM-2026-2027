@@ -127,6 +127,12 @@ Ahora aprendemos a "manejar" o más bien entender conflictos entre scopes de mav
 
 ## 12 - Propiedades y gestión de versiones
 
+En este apartado aprenderemos a usar las propiedades para que el gestión de versiones sea más ameno. Añadiendo a `<properties>` las versiones de los plugins nos ahorraremos tener que viajar por todo el XML para cambiar una versión (siempre que usemos ${XXX.version} en donde corresponde).
+
+![img](img/10.png)
+
+
+## 13 - Añadir y ejecutar pruebas con JUnit
 
 
 ## Problemas encontrados
