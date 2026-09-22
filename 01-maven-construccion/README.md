@@ -134,6 +134,26 @@ En este apartado aprenderemos a usar las propiedades para que el gestión de ver
 
 ## 13 - Añadir y ejecutar pruebas con JUnit
 
+Entramos en la creación de tests, esta parte creamos una clase sencilla y un test para probarla. En este caso los tests deben probar que el programa trabaja con `null` y que las listas devuelven copias no alterables. Estos fueron los tests que hice con ese propósito:
+```java
+@Test
+void rechazaTituloNull() {
+    var gestor = new GestorTareas();
+    assertThrows(IllegalArgumentException.class, () -> gestor.anadir(null));
+}
+
+@Test
+void listarNoPermiteModificarEstadoInterno() {
+    var gestor = new GestorTareas();
+    gestor.anadir("Aprender Maven");
+    List<String> lista = gestor.listar();
+    assertThrows(UnsupportedOperationException.class, () -> lista.add("Aprendido"));
+}
+```
+
+Y aquí la prueba de que todo pasa:
+
+![img](img/11.png)
 
 ## Problemas encontrados
 - Durante la configuración de la máquina virtual me topé con barreras como arreglar los permisos de usuario, que gracias a los conocimientos del año pasado pude resolver de la manera adecuada con `su` y editando el archivo `sudoers` en la ruta `/etc/sudoers`
@@ -141,3 +161,16 @@ En este apartado aprenderemos a usar las propiedades para que el gestión de ver
 
 - No pude instalar la versión de Java 17 para el ejercicio, aunque investigué al respecto no tuve tiempo suficiente para solucionarlo. Como el objetivo de instalar Java 17 era el de entender qué papel desempeña el `pom.xml` en el fijado de las versiones, considero que aprendí lo que tenía que aprender.
 **NOTA**: Pude solucionarlo, el problema era el `javac`, que al parecer no tenía ninguno instalado estaba dando problemas, pero me di cuenta muy tarde para llevarlo a cabo y sacar capturas (falta de tiempo).
+
+
+
+- En el ejercicio 13, en la página de Code Learn Academy, se nos da la dependencia del JUnit lista para pegar en el pom.xml, pero justo en el anterior ejercicio vimos cómo manejar versiones de dependencias y este fragmento carece de una, lo cual da error al compilar:
+```xml
+<dependency>
+  <groupId>org.junit.jupiter</groupId>
+  <artifactId>junit-jupiter</artifactId>
+  <version>${junit.version}</version> <!--Esto no estaba-->
+  <scope>test</scope>
+</dependency>
+
+```
