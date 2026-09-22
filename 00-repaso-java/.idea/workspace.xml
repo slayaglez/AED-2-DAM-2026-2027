@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b316e171-1693-4dfd-a801-4a6177e89780" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 7,
+  "fromUser": false
+}]]></component>
+  <component name="ProjectId" id="3JdwrREwaPjlt006de5KNp1aFTA" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "JUnit.IfElseServiceTest.executor": "Run",
+    "JUnit.ListServiceTest.eliminarNumerosDuplicadosConDuplicadosDevuelveListaSinDuplicados.executor": "Run",
+    "JUnit.ListServiceTest.executor": "Run",
+    "JUnit.ListServiceTest.filtrarPalabrasPorLongitudDatosValidosDevuelveListaFiltrada.executor": "Run",
+    "JUnit.ListServiceTest.filtrarPalabrasPorLongitudListaVaciaDevuelveListaVacia.executor": "Run",
+    "JUnit.ListServiceTest.filtrarPalabrasPorLongitudLongitudInvalidaLanzaExcepcion.executor": "Run",
+    "JUnit.ListServiceTest.ordenarNumerosAscendenteDatosValidosDevuelveListaOrdenada.executor": "Run",
+    "JUnit.SwitchServiceTest.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/home/alumno/dam/segundo/AED-2-DAM-2026-2027",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true"
+  }
+}]]></component>
+  <component name="RunManager" selected="JUnit.SwitchServiceTest">
+    <configuration name="IfElseServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="docencia-bloques-solucion" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.docencia.condicionales.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.docencia.condicionales" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.condicionales.IfElseServiceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ListServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="docencia-bloques-solucion" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.docencia.colecciones.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.docencia.colecciones" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.ListServiceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ListServiceTest.eliminarNumerosDuplicadosConDuplicadosDevuelveListaSinDuplicados" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="docencia-bloques-solucion" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.docencia.colecciones.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.docencia.colecciones" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.ListServiceTest" />
+      <option name="METHOD_NAME" value="eliminarNumerosDuplicadosConDuplicadosDevuelveListaSinDuplicados" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ListServiceTest.ordenarNumerosAscendenteDatosValidosDevuelveListaOrdenada" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="docencia-bloques-solucion" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.docencia.colecciones.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.docencia.colecciones" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.ListServiceTest" />
+      <option name="METHOD_NAME" value="ordenarNumerosAscendenteDatosValidosDevuelveListaOrdenada" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SwitchServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="docencia-bloques-solucion" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.docencia.condicionales.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.docencia.condicionales" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.condicionales.SwitchServiceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.SwitchServiceTest" />
+        <item itemvalue="JUnit.IfElseServiceTest" />
+        <item itemvalue="JUnit.ListServiceTest" />
+        <item itemvalue="JUnit.ListServiceTest.eliminarNumerosDuplicadosConDuplicadosDevuelveListaSinDuplicados" />
+        <item itemvalue="JUnit.ListServiceTest.ordenarNumerosAscendenteDatosValidosDevuelveListaOrdenada" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-a203e0a19954-intellij.indexing.shared.core-IU-262.10968.63" />
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-IU-262.10968.63" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b316e171-1693-4dfd-a801-4a6177e89780" name="Changes" comment="" />
+      <created>1790004451921</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1790004451921</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
