@@ -194,6 +194,14 @@ Primer contacto con un `.properties` que usaremos para asignar un nombre. Tambi�
 <hr>
 
 
+## 16 -  Empaquetar y ejecutar la aplicación
+
+Ha llegado la hora de empaquetar todo y ejecutar, siguiendo los pasos de mi terminal he logrado ejecutarlo fuera del proyecto (en el escritorio)
+
+![img](img/14.png)
+
+<hr>
+
 ## Problemas encontrados
 - Durante la configuración de la máquina virtual me topé con barreras como arreglar los permisos de usuario, que gracias a los conocimientos del año pasado pude resolver de la manera adecuada con `su` y editando el archivo `sudoers` en la ruta `/etc/sudoers`
 
