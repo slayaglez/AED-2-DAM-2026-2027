@@ -176,7 +176,14 @@ Y aquí la prueba de que todo pasa:
 
 ## 14 - El build como comprobación de calidad
 
+El build ya asegura que ciertos errores no se han cometido, por ejemplo, la falta de la versión en la dependencia de JUnit, provocaba un error de compilación.
 
+Por otro lado tenemos el error controlado de eliminar `titulos.add(titulo);` que provoca un error de aserción como muestra la imagen:
+
+![img](img/12.png)
+
+
+<hr>
 
 ## Problemas encontrados
 - Durante la configuración de la máquina virtual me topé con barreras como arreglar los permisos de usuario, que gracias a los conocimientos del año pasado pude resolver de la manera adecuada con `su` y editando el archivo `sudoers` en la ruta `/etc/sudoers`
