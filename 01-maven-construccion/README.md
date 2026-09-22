@@ -34,8 +34,8 @@ Tras ello creamos el `Main.java` con un SystemPrintOut sencillo y editamos el `p
 Para comprobar que el `pom.xml` ha quedado bien escribimos el comando `mvn validate` en la terminal, ubicado en el directorio raíz del proyecto. El resultado deberia ser como el que se muestra en la siguiente imagen:
 
 ![img](img/1.png)
-<hr>
 
+<hr>
 
 ## 04 - Compilar y entender archivos
 Empecemos a compilar el proyecto con `mvn compile`, esto debería imprimir el siguiente mensaje por consola:
@@ -46,6 +46,7 @@ Tras ello localizamos las clases con `find target/classes -type f` y comprobamos
 
 Como se menciona en la práctica `mvn clean` elimina la carpeta `target`
 
+<hr>
 
 ## 05 - Ciclos de vida, fases y goals
 ### Identificar entorno
@@ -71,6 +72,8 @@ La ejecución de `find target -maxdepth 2 -type f | sort` sí devuelve lo que de
 
 ![img](img/4.png)
 
+<hr>
+
 ## 06 - Añadir y utilizar una dependencia
 
 Editamos el `pom.xml` por primera vez para agregar una dependencia, para ver su correcto funcionamiento editamos también el `Main.java`
@@ -78,6 +81,8 @@ Editamos el `pom.xml` por primera vez para agregar una dependencia, para ver su 
 Como resultado debería aparecer el siguiente mensaje:
 
 ![img](img/5.png)
+
+<hr>
 
 ## 07 - Maven central y repo local
 
@@ -87,6 +92,8 @@ También se debe recalcar que de esta forma, con `mvn install` copias tu proyect
 
 ![img](img/6.png)
 
+<hr>
+
 ## 08 - Repositorios externos y settings.xml
 
 Tras seguir con los ejercicios, pasamos a crear una carpeta config, que será como un perfil con configuraciones de entorno.
@@ -95,11 +102,15 @@ Notable en este apartado que con `-P`, el perfil se activa y Maven añade el rep
 
 ![img](img/7.png)
 
+<hr>
+
 ## 09 - Repositorios privados, mirrors y proxy
 Como no tengo una cuenta autorizada y un Nexus o un Artifactory dejaré este ejercicio como un análisis.
 
 Mirror: empresa. URL: https://repo.empresa.example/repository/maven-public/ (sin servicio disponible).
 `mirrorOf=*` redirige todas las peticiones al mirror. Las credenciales se asocian porque el `<server><id>` coincide con el `<mirror><id>`, y se leen de las variables de entorno `MAVEN_REPO_USER` y `MAVEN_REPO_TOKEN`, así no hay secretos en el archivo.
+
+<hr>
 
 ## 10 - Profiles: activar configuraciones de Maven
 
@@ -119,11 +130,15 @@ Justo debajo del id, de esta forma podremos activarlo con `mvn -Dinforme=true he
 
 ![img](img/8.png)
 
+<hr>
+
 ## 11 - Dependencias transitivas, scopes y conflictos
 
 Ahora aprendemos a "manejar" o más bien entender conflictos entre scopes de maven. En la imagen vemos cómo silencio un aviso del `commons-lang3` con el exclusions en el pom.xml y la salida al ejecutar `mvn dependency:tree -Dverbose -Dincludes=org.apache.commons`
 
 ![img](img/9.png)
+
+<hr>
 
 ## 12 - Propiedades y gestión de versiones
 
@@ -131,6 +146,8 @@ En este apartado aprenderemos a usar las propiedades para que el gestión de ver
 
 ![img](img/10.png)
 
+
+<hr>
 
 ## 13 - Añadir y ejecutar pruebas con JUnit
 
@@ -154,6 +171,12 @@ void listarNoPermiteModificarEstadoInterno() {
 Y aquí la prueba de que todo pasa:
 
 ![img](img/11.png)
+
+<hr>
+
+## 14 - El build como comprobación de calidad
+
+
 
 ## Problemas encontrados
 - Durante la configuración de la máquina virtual me topé con barreras como arreglar los permisos de usuario, que gracias a los conocimientos del año pasado pude resolver de la manera adecuada con `su` y editando el archivo `sudoers` en la ruta `/etc/sudoers`
