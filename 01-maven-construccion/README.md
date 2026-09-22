@@ -38,5 +38,38 @@ Para comprobar que el `pom.xml` ha quedado bien escribimos el comando `mvn valid
 
 
 ## 04 - Compilar y entender archivos
-Empecemos a compilar el proyecto con `mvn compile`
+Empecemos a compilar el proyecto con `mvn compile`, esto debería imprimir el siguiente mensaje por consola:
 
+![img](img/2.png)
+
+Tras ello localizamos las clases con `find target/classes -type f` y comprobamos que todo funcione.
+
+Como se menciona en la práctica `mvn clean` elimina la carpeta `target`
+
+
+## 05 - Ciclos de vida, fases y goals
+### Identificar entorno
+Usamos los comandos para discernir nuestro usuario y versiones de Java Y Maven.
+
+```bash
+whoami
+pwd
+java -version
+javac -version
+mvn -version
+echo "$JAVA_HOME"
+echo "$PATH"
+```
+
+![img](img/3.png)
+
+NOTA: Tras mucho intentarlo no encontré manera de instalar el Java 17. Por eso saltaré este paso
+
+Aún así, suponiendo que tuviera Java 17 instalado el build de Maven no funcionaría porque en el `pom.xml` se exige que la versión de Java sea la 21.
+
+La ejecución de `find target -maxdepth 2 -type f | sort` sí devuelve lo que debería:
+
+![img](img/4.png)
+
+## Problemas encontrados
+- Durante la configuración de la máquina virtual me topé con barreras como arreglar los permisos de usuario, que gracias a los conocimientos del año pasado pude resolver de la manera adecuada con `su` y editando el archivo `sudoers` en la ruta `/etc/sudoers`
