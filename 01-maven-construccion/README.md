@@ -185,6 +185,15 @@ Por otro lado tenemos el error controlado de eliminar `titulos.add(titulo);` que
 
 <hr>
 
+## 15 - Recursos y configuración de la aplicación
+
+Primer contacto con un `.properties` que usaremos para asignar un nombre. También vemos su aparición cuando usamos el comando `jar tf target/gestor-tareas-1.0.0-SNAPSHOT.jar`.
+
+![img](img/13.png)
+
+<hr>
+
+
 ## Problemas encontrados
 - Durante la configuración de la máquina virtual me topé con barreras como arreglar los permisos de usuario, que gracias a los conocimientos del año pasado pude resolver de la manera adecuada con `su` y editando el archivo `sudoers` en la ruta `/etc/sudoers`
 
