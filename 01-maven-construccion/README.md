@@ -1,4 +1,36 @@
 # Práctica 01
+
+<hr>
+
+## Índice de Contenidos
+<details><summary><b>Ver índice</b></summary>
+
+- [Práctica 01](#práctica-01)
+    - [03 - Maven y construcción de proyectos en Java](#03---maven-y-construcción-de-proyectos-en-java)
+        - [Introducción](#introducción)
+        - [Primeros pasos](#primeros-pasos)
+        - [Creación del proyecto](#creación-del-proyecto)
+    - [04 - Compilar y entender archivos](#04---compilar-y-entender-archivos)
+    - [05 - Ciclos de vida, fases y goals](#05---ciclos-de-vida-fases-y-goals)
+        - [Identificar entorno](#identificar-entorno)
+    - [06 - Añadir y utilizar una dependencia](#06---añadir-y-utilizar-una-dependencia)
+    - [07 - Maven central y repo local](#07---maven-central-y-repo-local)
+    - [08 - Repositorios externos y settings.xml](#08---repositorios-externos-y-settingsxml)
+    - [09 - Repositorios privados, mirrors y proxy](#09---repositorios-privados-mirrors-y-proxy)
+    - [10 - Profiles: activar configuraciones de Maven](#10---profiles-activar-configuraciones-de-maven)
+    - [11 - Dependencias transitivas, scopes y conflictos](#11---dependencias-transitivas-scopes-y-conflictos)
+    - [12 - Propiedades y gestión de versiones](#12---propiedades-y-gestión-de-versiones)
+    - [13 - Añadir y ejecutar pruebas con JUnit](#13---añadir-y-ejecutar-pruebas-con-junit)
+    - [14 - El build como comprobación de calidad](#14---el-build-como-comprobación-de-calidad)
+    - [15 - Recursos y configuración de la aplicación](#15---recursos-y-configuración-de-la-aplicación)
+    - [16 -  Empaquetar y ejecutar la aplicación](#16---empaquetar-y-ejecutar-la-aplicación)
+    - [17 - Crear y utilizar Maven Wrapper](#17---crear-y-utilizar-maven-wrapper)
+- [Conclusión final](#conclusión-final)
+    - [Problemas encontrados](#problemas-encontrados)
+</details>
+
+<hr>
+
 ## 03 - Maven y construcción de proyectos en Java
 
 ### Introducción
@@ -202,6 +234,20 @@ Ha llegado la hora de empaquetar todo y ejecutar, siguiendo los pasos de mi term
 
 <hr>
 
+## 17 - Crear y utilizar Maven Wrapper
+
+Un wrapper en escencia es un plugin que descargará la distribución pertinente en su primer uso.
+
+![img](img/15.png)
+
+Aquí vemos como lo que el wrapper controla es la versión de Maven, ya que comparandola con `mvn -version` hay una diferencia de versión. Lo que no controla son elementos como el **JDK**, la red y el sistema operativo.
+
+Es decir que el wrapper controla qué Maven se ejecuta pero no en qué entorno lo hace.
+
+<hr>
+
+# Conclusión final
+
 ## Problemas encontrados
 - Durante la configuración de la máquina virtual me topé con barreras como arreglar los permisos de usuario, que gracias a los conocimientos del año pasado pude resolver de la manera adecuada con `su` y editando el archivo `sudoers` en la ruta `/etc/sudoers`
 
@@ -221,3 +267,5 @@ Ha llegado la hora de empaquetar todo y ejecutar, siguiendo los pasos de mi term
 </dependency>
 
 ```
+
+> Sebastián Laya González | slayaglez
