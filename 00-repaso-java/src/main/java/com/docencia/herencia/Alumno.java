@@ -9,4 +9,9 @@ public class Alumno extends Persona {
     }
 
     public String getExpediente() { return expediente; }
+
+    @Override
+    public String toString() {
+        return "ALUMNO: " + super.toString();
+    }
 }
