@@ -5,7 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b316e171-1693-4dfd-a801-4a6177e89780" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/numeros/MathServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/numeros/MathServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/cadenas/StringServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/cadenas/StringServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/docencia/cadenas/StringServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/docencia/cadenas/StringServiceImpl.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,12 +62,15 @@
     "JUnit.MapServiceTest.obtenerClaveConMayorValorMapaVacioLanzaExcepcion.executor": "Run",
     "JUnit.MapServiceTest.obtenerValorPorClaveClaveInexistenteDevuelveCero.executor": "Run",
     "JUnit.MathServiceTest.executor": "Run",
+    "JUnit.MathServiceTest.redondearHaciaArribaDecimalDevuelveEnteroSuperior.executor": "Run",
     "JUnit.SetServiceTest.contieneElementoExistenteDevuelveTrue.executor": "Run",
     "JUnit.SetServiceTest.contieneElementoValorNullLanzaExcepcion.executor": "Run",
     "JUnit.SetServiceTest.intersectarConjuntosConCoincidenciasDevuelveInterseccion.executor": "Run",
     "JUnit.SetServiceTest.obtenerElementosUnicosConDuplicadosDevuelveSetSinDuplicados.executor": "Run",
     "JUnit.SetServiceTest.restarConjuntosDatosValidosDevuelveDiferencia.executor": "Run",
     "JUnit.SetServiceTest.unirConjuntosDatosValidosDevuelveUnion.executor": "Run",
+    "JUnit.StringServiceTest.executor": "Run",
+    "JUnit.StringServiceTest.extraerInicialesNombreCompletoDevuelveIniciales.executor": "Run",
     "JUnit.SwitchServiceTest.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -86,80 +91,81 @@
     "to.speed.mode.migration.done": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="JUnit.MathServiceTest">
-    <configuration name="IntegerServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="JUnit.StringServiceTest">
+    <configuration name="StringServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.docencia.numeros.*" />
+          <option name="PATTERN" value="com.docencia.cadenas.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.numeros" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.numeros.IntegerServiceTest" />
+      <option name="PACKAGE_NAME" value="com.docencia.cadenas" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.cadenas.StringServiceTest" />
       <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="IntegerServiceTest.calcularFactorialNumeroNegativoLanzaExcepcion" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="StringServiceTest.contarVocalesTextoValidoDevuelveCantidad" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.docencia.numeros.*" />
+          <option name="PATTERN" value="com.docencia.cadenas.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.numeros" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.numeros.IntegerServiceTest" />
-      <option name="METHOD_NAME" value="calcularFactorialNumeroNegativoLanzaExcepcion" />
+      <option name="PACKAGE_NAME" value="com.docencia.cadenas" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.cadenas.StringServiceTest" />
+      <option name="METHOD_NAME" value="contarVocalesTextoValidoDevuelveCantidad" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="IntegerServiceTest.esParNumeroNullLanzaExcepcion" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="StringServiceTest.esPalindromoIgnorandoEspaciosDevuelveTrue" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.docencia.numeros.*" />
+          <option name="PATTERN" value="com.docencia.cadenas.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.numeros" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.numeros.IntegerServiceTest" />
-      <option name="METHOD_NAME" value="esParNumeroNullLanzaExcepcion" />
+      <option name="PACKAGE_NAME" value="com.docencia.cadenas" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.cadenas.StringServiceTest" />
+      <option name="METHOD_NAME" value="esPalindromoIgnorandoEspaciosDevuelveTrue" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="MathServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="StringServiceTest.normalizarTextoConEspaciosDevuelveTextoLimpio" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.docencia.numeros.*" />
+          <option name="PATTERN" value="com.docencia.cadenas.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.numeros" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.numeros.MathServiceTest" />
-      <option name="TEST_OBJECT" value="class" />
+      <option name="PACKAGE_NAME" value="com.docencia.cadenas" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.cadenas.StringServiceTest" />
+      <option name="METHOD_NAME" value="normalizarTextoConEspaciosDevuelveTextoLimpio" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="MathServiceTest.redondearHaciaArribaDecimalDevuelveEnteroSuperior" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="StringServiceTest.normalizarTextoTextoNullLanzaExcepcion" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.docencia.numeros.*" />
+          <option name="PATTERN" value="com.docencia.cadenas.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.numeros" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.numeros.MathServiceTest" />
-      <option name="METHOD_NAME" value="redondearHaciaArribaDecimalDevuelveEnteroSuperior" />
+      <option name="PACKAGE_NAME" value="com.docencia.cadenas" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.cadenas.StringServiceTest" />
+      <option name="METHOD_NAME" value="normalizarTextoTextoNullLanzaExcepcion" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -167,11 +173,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.MathServiceTest" />
-        <item itemvalue="JUnit.MathServiceTest.redondearHaciaArribaDecimalDevuelveEnteroSuperior" />
-        <item itemvalue="JUnit.IntegerServiceTest.calcularFactorialNumeroNegativoLanzaExcepcion" />
-        <item itemvalue="JUnit.IntegerServiceTest" />
-        <item itemvalue="JUnit.IntegerServiceTest.esParNumeroNullLanzaExcepcion" />
+        <item itemvalue="JUnit.StringServiceTest" />
+        <item itemvalue="JUnit.StringServiceTest.normalizarTextoTextoNullLanzaExcepcion" />
+        <item itemvalue="JUnit.StringServiceTest.esPalindromoIgnorandoEspaciosDevuelveTrue" />
+        <item itemvalue="JUnit.StringServiceTest.contarVocalesTextoValidoDevuelveCantidad" />
+        <item itemvalue="JUnit.StringServiceTest.normalizarTextoConEspaciosDevuelveTextoLimpio" />
       </list>
     </recent_temporary>
   </component>

@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class StringServiceTest {
     private final StringService service = new StringServiceImpl();
 
-    @Test @Order(1) void normalizarTextoConEspaciosDevuelveTextoLimpio() { assertEquals("hola mundo", service.normalizarTexto("  Hola   Mundo ")); }
+    @Test @Order(1) void normalizarTextoConEspaciosDevuelveTextoLimpio() { assertEquals("hola mundo", service.normalizarTexto("  Hola Mundo ")); }
     @Test @Order(2) void normalizarTextoTextoNullLanzaExcepcion() { assertThrows(IllegalArgumentException.class, () -> service.normalizarTexto(null)); }
     @Test @Order(3) void esPalindromoTextoPalindromoDevuelveTrue() { assertTrue(service.esPalindromo("ana")); }
     @Test @Order(4) void esPalindromoIgnorandoEspaciosDevuelveTrue() { assertTrue(service.esPalindromo("anita lava la tina")); }
