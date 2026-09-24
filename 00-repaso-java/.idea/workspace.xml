@@ -4,16 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b316e171-1693-4dfd-a801-4a6177e89780" name="Changes" comment="" />
+    <list default="true" id="b316e171-1693-4dfd-a801-4a6177e89780" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7,
-  "fromUser": false
-}]]></component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7,
+  &quot;fromUser&quot;: false
+}</component>
   <component name="ProjectId" id="3JdwrREwaPjlt006de5KNp1aFTA" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -22,6 +27,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "JUnit.IfElseServiceTest.executor": "Run",
+    "JUnit.IfElseServiceTest.puedeAccederActivoYMayorDevuelveTrue.executor": "Run",
     "JUnit.ListServiceTest.eliminarNumerosDuplicadosConDuplicadosDevuelveListaSinDuplicados.executor": "Run",
     "JUnit.ListServiceTest.executor": "Run",
     "JUnit.ListServiceTest.filtrarPalabrasPorLongitudDatosValidosDevuelveListaFiltrada.executor": "Run",
@@ -31,12 +37,14 @@
     "JUnit.SwitchServiceTest.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "main",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/alumno/dam/segundo/AED-2-DAM-2026-2027",
+    "last_opened_file_path": "/home/sebastian/dam/segundo/AED-2-DAM-2026-2027/00-repaso-java",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -57,6 +65,22 @@
       <option name="PACKAGE_NAME" value="com.docencia.condicionales" />
       <option name="MAIN_CLASS_NAME" value="com.docencia.condicionales.IfElseServiceTest" />
       <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="IfElseServiceTest.puedeAccederActivoYMayorDevuelveTrue" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="docencia-bloques-solucion" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.docencia.condicionales.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.docencia.condicionales" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.condicionales.IfElseServiceTest" />
+      <option name="METHOD_NAME" value="puedeAccederActivoYMayorDevuelveTrue" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -92,22 +116,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ListServiceTest.ordenarNumerosAscendenteDatosValidosDevuelveListaOrdenada" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="docencia-bloques-solucion" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.docencia.colecciones.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.colecciones" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.ListServiceTest" />
-      <option name="METHOD_NAME" value="ordenarNumerosAscendenteDatosValidosDevuelveListaOrdenada" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="SwitchServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
@@ -126,10 +134,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.SwitchServiceTest" />
+        <item itemvalue="JUnit.IfElseServiceTest.puedeAccederActivoYMayorDevuelveTrue" />
         <item itemvalue="JUnit.IfElseServiceTest" />
         <item itemvalue="JUnit.ListServiceTest" />
         <item itemvalue="JUnit.ListServiceTest.eliminarNumerosDuplicadosConDuplicadosDevuelveListaSinDuplicados" />
-        <item itemvalue="JUnit.ListServiceTest.ordenarNumerosAscendenteDatosValidosDevuelveListaOrdenada" />
       </list>
     </recent_temporary>
   </component>
