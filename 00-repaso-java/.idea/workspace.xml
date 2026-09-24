@@ -5,9 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b316e171-1693-4dfd-a801-4a6177e89780" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/herencia/Alumno.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/herencia/Alumno.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/herencia/HerenciaServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/herencia/HerenciaServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/herencia/Persona.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/herencia/Persona.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/herencia/HerenciaService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/herencia/HerenciaService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/numeros/IntegerServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/numeros/IntegerServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/docencia/numeros/IntegerServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/docencia/numeros/IntegerServiceImpl.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,6 +41,8 @@
     "JUnit.HerenciaServiceTest.executor": "Run",
     "JUnit.IfElseServiceTest.executor": "Run",
     "JUnit.IfElseServiceTest.puedeAccederActivoYMayorDevuelveTrue.executor": "Run",
+    "JUnit.IntegerServiceTest.executor": "Run",
+    "JUnit.IntegerServiceTest.sumarDigitosNumeroNegativoDevuelveSuma.executor": "Run",
     "JUnit.ListServiceTest.calcularMediaListaDatosValidosDevuelveMedia.executor": "Run",
     "JUnit.ListServiceTest.calcularMediaListaListaVaciaLanzaExcepcion.executor": "Run",
     "JUnit.ListServiceTest.eliminarNumerosDuplicadosConDuplicadosDevuelveListaSinDuplicados.executor": "Run",
@@ -83,70 +86,7 @@
     "to.speed.mode.migration.done": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="JUnit.HerenciaServiceTest">
-    <configuration name="CsvServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="docencia-bloques-solucion" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.docencia.ficheros.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.ficheros" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.ficheros.CsvServiceTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="CsvServiceTest.contarFrecuenciaColumnaDatosValidosDevuelveMapaFrecuencias" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="docencia-bloques-solucion" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.docencia.ficheros.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.ficheros" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.ficheros.CsvServiceTest" />
-      <option name="METHOD_NAME" value="contarFrecuenciaColumnaDatosValidosDevuelveMapaFrecuencias" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="CsvServiceTest.filtrarRegistrosPorValorCoincidenciasDevuelveRegistros" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="docencia-bloques-solucion" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.docencia.ficheros.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.ficheros" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.ficheros.CsvServiceTest" />
-      <option name="METHOD_NAME" value="filtrarRegistrosPorValorCoincidenciasDevuelveRegistros" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="CsvServiceTest.filtrarRegistrosPorValorColumnaInvalidaLanzaExcepcion" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="docencia-bloques-solucion" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.docencia.ficheros.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.ficheros" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.ficheros.CsvServiceTest" />
-      <option name="METHOD_NAME" value="filtrarRegistrosPorValorColumnaInvalidaLanzaExcepcion" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="JUnit.IntegerServiceTest.calcularFactorialNumeroNegativoLanzaExcepcion">
     <configuration name="HerenciaServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
@@ -162,13 +102,76 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="IntegerServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="docencia-bloques-solucion" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.docencia.numeros.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.docencia.numeros" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.numeros.IntegerServiceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="IntegerServiceTest.calcularFactorialNumeroNegativoLanzaExcepcion" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="docencia-bloques-solucion" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.docencia.numeros.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.docencia.numeros" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.numeros.IntegerServiceTest" />
+      <option name="METHOD_NAME" value="calcularFactorialNumeroNegativoLanzaExcepcion" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="IntegerServiceTest.esParNumeroNullLanzaExcepcion" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="docencia-bloques-solucion" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.docencia.numeros.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.docencia.numeros" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.numeros.IntegerServiceTest" />
+      <option name="METHOD_NAME" value="esParNumeroNullLanzaExcepcion" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="IntegerServiceTest.sumarDigitosNumeroNegativoDevuelveSuma" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="docencia-bloques-solucion" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.docencia.numeros.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.docencia.numeros" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.numeros.IntegerServiceTest" />
+      <option name="METHOD_NAME" value="sumarDigitosNumeroNegativoDevuelveSuma" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.IntegerServiceTest.calcularFactorialNumeroNegativoLanzaExcepcion" />
+        <item itemvalue="JUnit.IntegerServiceTest" />
+        <item itemvalue="JUnit.IntegerServiceTest.esParNumeroNullLanzaExcepcion" />
+        <item itemvalue="JUnit.IntegerServiceTest.sumarDigitosNumeroNegativoDevuelveSuma" />
         <item itemvalue="JUnit.HerenciaServiceTest" />
-        <item itemvalue="JUnit.CsvServiceTest" />
-        <item itemvalue="JUnit.CsvServiceTest.contarFrecuenciaColumnaDatosValidosDevuelveMapaFrecuencias" />
-        <item itemvalue="JUnit.CsvServiceTest.filtrarRegistrosPorValorColumnaInvalidaLanzaExcepcion" />
-        <item itemvalue="JUnit.CsvServiceTest.filtrarRegistrosPorValorCoincidenciasDevuelveRegistros" />
       </list>
     </recent_temporary>
   </component>
