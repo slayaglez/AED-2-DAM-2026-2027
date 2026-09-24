@@ -6,9 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="b316e171-1693-4dfd-a801-4a6177e89780" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/colecciones/ListService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/colecciones/ListService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/colecciones/ListServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/colecciones/ListServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/docencia/colecciones/ListServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/docencia/colecciones/ListServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/colecciones/MapServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/colecciones/MapServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/docencia/colecciones/MapServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/docencia/colecciones/MapServiceImpl.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,6 +39,11 @@
     "JUnit.ListServiceTest.filtrarPalabrasPorLongitudLongitudInvalidaLanzaExcepcion.executor": "Run",
     "JUnit.ListServiceTest.ordenarNumerosAscendenteDatosValidosDevuelveListaOrdenada.executor": "Run",
     "JUnit.ListServiceTest.sumarElementosListaDatosValidosDevuelveSuma.executor": "Run",
+    "JUnit.MapServiceTest.calcularMediaPorCategoriaDatosValidosDevuelveMedias.executor": "Run",
+    "JUnit.MapServiceTest.contarFrecuenciaPalabrasDatosValidosDevuelveFrecuencias.executor": "Run",
+    "JUnit.MapServiceTest.contarFrecuenciaPalabrasListaVaciaDevuelveMapaVacio.executor": "Run",
+    "JUnit.MapServiceTest.obtenerClaveConMayorValorDatosValidosDevuelveClave.executor": "Run",
+    "JUnit.MapServiceTest.obtenerValorPorClaveClaveInexistenteDevuelveCero.executor": "Run",
     "JUnit.SwitchServiceTest.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -59,8 +63,8 @@
     "to.speed.mode.migration.done": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="JUnit.ListServiceTest">
-    <configuration name="ListServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="JUnit.MapServiceTest">
+    <configuration name="MapServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
@@ -69,13 +73,13 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="com.docencia.colecciones" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.ListServiceTest" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.MapServiceTest" />
       <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ListServiceTest.calcularMediaListaDatosValidosDevuelveMedia" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="MapServiceTest.calcularMediaPorCategoriaDatosValidosDevuelveMedias" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
@@ -84,14 +88,14 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="com.docencia.colecciones" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.ListServiceTest" />
-      <option name="METHOD_NAME" value="calcularMediaListaDatosValidosDevuelveMedia" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.MapServiceTest" />
+      <option name="METHOD_NAME" value="calcularMediaPorCategoriaDatosValidosDevuelveMedias" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ListServiceTest.calcularMediaListaListaVaciaLanzaExcepcion" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="MapServiceTest.filtrarPorValorMinimoDatosValidosDevuelveMapaFiltrado" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
@@ -100,14 +104,14 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="com.docencia.colecciones" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.ListServiceTest" />
-      <option name="METHOD_NAME" value="calcularMediaListaListaVaciaLanzaExcepcion" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.MapServiceTest" />
+      <option name="METHOD_NAME" value="filtrarPorValorMinimoDatosValidosDevuelveMapaFiltrado" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ListServiceTest.eliminarNumerosDuplicadosConDuplicadosDevuelveListaSinDuplicados" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="MapServiceTest.obtenerClaveConMayorValorDatosValidosDevuelveClave" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
@@ -116,14 +120,14 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="com.docencia.colecciones" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.ListServiceTest" />
-      <option name="METHOD_NAME" value="eliminarNumerosDuplicadosConDuplicadosDevuelveListaSinDuplicados" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.MapServiceTest" />
+      <option name="METHOD_NAME" value="obtenerClaveConMayorValorDatosValidosDevuelveClave" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ListServiceTest.sumarElementosListaDatosValidosDevuelveSuma" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="MapServiceTest.obtenerClaveConMayorValorMapaVacioLanzaExcepcion" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
@@ -132,8 +136,8 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="com.docencia.colecciones" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.ListServiceTest" />
-      <option name="METHOD_NAME" value="sumarElementosListaDatosValidosDevuelveSuma" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.MapServiceTest" />
+      <option name="METHOD_NAME" value="obtenerClaveConMayorValorMapaVacioLanzaExcepcion" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -141,11 +145,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.ListServiceTest" />
-        <item itemvalue="JUnit.ListServiceTest.eliminarNumerosDuplicadosConDuplicadosDevuelveListaSinDuplicados" />
-        <item itemvalue="JUnit.ListServiceTest.calcularMediaListaListaVaciaLanzaExcepcion" />
-        <item itemvalue="JUnit.ListServiceTest.calcularMediaListaDatosValidosDevuelveMedia" />
-        <item itemvalue="JUnit.ListServiceTest.sumarElementosListaDatosValidosDevuelveSuma" />
+        <item itemvalue="JUnit.MapServiceTest" />
+        <item itemvalue="JUnit.MapServiceTest.filtrarPorValorMinimoDatosValidosDevuelveMapaFiltrado" />
+        <item itemvalue="JUnit.MapServiceTest.obtenerClaveConMayorValorMapaVacioLanzaExcepcion" />
+        <item itemvalue="JUnit.MapServiceTest.obtenerClaveConMayorValorDatosValidosDevuelveClave" />
+        <item itemvalue="JUnit.MapServiceTest.calcularMediaPorCategoriaDatosValidosDevuelveMedias" />
       </list>
     </recent_temporary>
   </component>
