@@ -2,6 +2,7 @@ package com.docencia.sqlite;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.sql.PreparedStatement;
 import java.util.List;
 
 public class ClienteSqliteRepository implements ClienteRepository {
@@ -27,20 +28,64 @@ public class ClienteSqliteRepository implements ClienteRepository {
 
     @Override
     public Boolean save(Cliente cliente) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        try (Connection connection = getConnection();
+             PreparedStatement sentencia = connection
+                     .prepareStatement("INSERT INTO cliente VALUES (?, ?, ?, ?)")) {
+            sentencia.setString(1, cliente.getDni());
+            sentencia.setString(2, cliente.getNombre());
+            sentencia.setString(3, cliente.getEmail());
+            sentencia.setString(4, cliente.getCiudad());
+            return sentencia.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Error creando cliente" + e);
+            return false;
+        }
     }
 
     @Override
     public Cliente findByDni(String dni) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByDni'");
+
+        try (Connection connection = getConnection();
+             PreparedStatement sentencia = connection.prepareStatement("SELECT * FROM cliente WHERE dni = ?")) {
+             sentencia.setString(1, dni);
+            ResultSet resultado = sentencia.executeQuery();
+
+            if(!resultado.next()) {
+                throw new IllegalStateException("El cliente no existe");
+            }
+
+            String nombre = resultado.getString("nombre");
+            String email = resultado.getString("email");
+            String ciudad = resultado.getString("ciudad");
+
+            return new Cliente(dni, nombre, email, ciudad);
+
+        } catch (Exception e) {
+            System.err.println("Error buscando clientes" + e);
+            return null;
+        }
     }
 
     @Override
     public List<Cliente> findAll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+        List<Cliente> clientes = new ArrayList<>();
+        try (Connection connection = getConnection();
+             PreparedStatement sentencia = connection.prepareStatement("SELECT * FROM cliente")) {
+            ResultSet resultado = sentencia.executeQuery();
+
+            while (resultado.next()) {
+                String dni = resultado.getString("dni");
+                String nombre = resultado.getString("nombre");
+                String email = resultado.getString("email");
+                String ciudad = resultado.getString("ciudad");
+                clientes.add(new Cliente(dni, nombre, email, ciudad));
+            }
+            return clientes;
+
+        } catch (Exception e) {
+            System.err.println("Error buscando clientes" + e);
+            return null;
+        }
     }
 
     @Override

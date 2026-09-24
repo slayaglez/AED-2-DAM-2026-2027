@@ -6,8 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="b316e171-1693-4dfd-a801-4a6177e89780" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/regex/RegexServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/regex/RegexServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/docencia/regex/RegexServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/docencia/regex/RegexServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/sqlite/ClienteSqliteRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/sqlite/ClienteSqliteRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/docencia/sqlite/ClienteSqliteRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/docencia/sqlite/ClienteSqliteRepository.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +28,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "JUnit.ClienteDbServiceTest.findAllSinDatosDevuelveListaVacia.executor": "Run",
     "JUnit.CsvServiceTest.contarFrecuenciaColumnaDatosValidosDevuelveMapaFrecuencias.executor": "Run",
     "JUnit.CsvServiceTest.contarRegistrosCsvFicheroValidoDevuelveCantidad.executor": "Run",
     "JUnit.CsvServiceTest.escribirLineasCsvDatosValidosCreaFichero.executor": "Run",
@@ -63,12 +64,14 @@
     "JUnit.MapServiceTest.obtenerValorPorClaveClaveInexistenteDevuelveCero.executor": "Run",
     "JUnit.MathServiceTest.executor": "Run",
     "JUnit.MathServiceTest.redondearHaciaArribaDecimalDevuelveEnteroSuperior.executor": "Run",
+    "JUnit.RegexServiceTest.executor": "Run",
     "JUnit.RegexServiceTest.validarDniFormatoInvalidoDevuelveFalse.executor": "Run",
     "JUnit.RegexServiceTest.validarDniFormatoValidoDevuelveTrue.executor": "Run",
     "JUnit.RegexServiceTest.validarDniTextoNullDevuelveFalse.executor": "Run",
     "JUnit.RegexServiceTest.validarEmailFormatoInvalidoDevuelveFalse.executor": "Run",
     "JUnit.RegexServiceTest.validarEmailFormatoValidoDevuelveTrue.executor": "Run",
     "JUnit.RegexServiceTest.validarNombreFormatoValidoDevuelveTrue.executor": "Run",
+    "JUnit.RegexServiceTest.validarNombreMuyCortoDevuelveFalse.executor": "Run",
     "JUnit.RegexServiceTest.validarTelefonoFormatoInvalidoDevuelveFalse.executor": "Run",
     "JUnit.RegexServiceTest.validarTelefonoFormatoValidoDevuelveTrue.executor": "Run",
     "JUnit.SetServiceTest.contieneElementoExistenteDevuelveTrue.executor": "Run",
@@ -93,7 +96,7 @@
     "git-widget-placeholder": "main",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/sebastian/dam/segundo/AED-2-DAM-2026-2027/00-repaso-java",
+    "last_opened_file_path": "/home/sebastian/dam/segundo/AED-2-DAM-2026-2027/03-productos-repositorios",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -103,7 +106,23 @@
     "to.speed.mode.migration.done": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="JUnit.RegexServiceTest">
+  <component name="RunManager" selected="JUnit.ClienteDbServiceTest.findAllSinDatosDevuelveListaVacia">
+    <configuration name="ClienteDbServiceTest.findAllSinDatosDevuelveListaVacia" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="docencia-bloques-solucion" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.docencia.sqlite.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.docencia.sqlite" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.sqlite.ClienteDbServiceTest" />
+      <option name="METHOD_NAME" value="findAllSinDatosDevuelveListaVacia" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="RegexServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
@@ -167,29 +186,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="RegexServiceTest.validarTelefonoFormatoValidoDevuelveTrue" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="docencia-bloques-solucion" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.docencia.regex.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.regex" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.regex.RegexServiceTest" />
-      <option name="METHOD_NAME" value="validarTelefonoFormatoValidoDevuelveTrue" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.ClienteDbServiceTest.findAllSinDatosDevuelveListaVacia" />
         <item itemvalue="JUnit.RegexServiceTest" />
         <item itemvalue="JUnit.RegexServiceTest.validarNombreMuyCortoDevuelveFalse" />
         <item itemvalue="JUnit.RegexServiceTest.validarNombreFormatoValidoDevuelveTrue" />
         <item itemvalue="JUnit.RegexServiceTest.validarTelefonoFormatoInvalidoDevuelveFalse" />
-        <item itemvalue="JUnit.RegexServiceTest.validarTelefonoFormatoValidoDevuelveTrue" />
       </list>
     </recent_temporary>
   </component>
