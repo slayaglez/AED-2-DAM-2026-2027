@@ -6,8 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="b316e171-1693-4dfd-a801-4a6177e89780" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/colecciones/SetServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/colecciones/SetServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/docencia/colecciones/SetServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/docencia/colecciones/SetServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/ficheros/CsvServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/ficheros/CsvServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/docencia/ficheros/CsvServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/docencia/ficheros/CsvServiceImpl.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +28,14 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "JUnit.CsvServiceTest.contarFrecuenciaColumnaDatosValidosDevuelveMapaFrecuencias.executor": "Run",
+    "JUnit.CsvServiceTest.contarRegistrosCsvFicheroValidoDevuelveCantidad.executor": "Run",
+    "JUnit.CsvServiceTest.escribirLineasCsvDatosValidosCreaFichero.executor": "Run",
+    "JUnit.CsvServiceTest.filtrarRegistrosPorValorCoincidenciasDevuelveRegistros.executor": "Run",
+    "JUnit.CsvServiceTest.filtrarRegistrosPorValorColumnaInvalidaLanzaExcepcion.executor": "Run",
+    "JUnit.CsvServiceTest.leerLineasCsvFicheroExistenteDevuelveLineas.executor": "Run",
+    "JUnit.CsvServiceTest.leerLineasCsvFicheroInexistenteLanzaExcepcion.executor": "Run",
+    "JUnit.CsvServiceTest.leerRegistrosCsvFicheroValidoDevuelveRegistros.executor": "Run",
     "JUnit.IfElseServiceTest.executor": "Run",
     "JUnit.IfElseServiceTest.puedeAccederActivoYMayorDevuelveTrue.executor": "Run",
     "JUnit.ListServiceTest.calcularMediaListaDatosValidosDevuelveMedia.executor": "Run",
@@ -51,6 +59,7 @@
     "JUnit.SetServiceTest.contieneElementoValorNullLanzaExcepcion.executor": "Run",
     "JUnit.SetServiceTest.intersectarConjuntosConCoincidenciasDevuelveInterseccion.executor": "Run",
     "JUnit.SetServiceTest.obtenerElementosUnicosConDuplicadosDevuelveSetSinDuplicados.executor": "Run",
+    "JUnit.SetServiceTest.restarConjuntosDatosValidosDevuelveDiferencia.executor": "Run",
     "JUnit.SetServiceTest.unirConjuntosDatosValidosDevuelveUnion.executor": "Run",
     "JUnit.SwitchServiceTest.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
@@ -68,85 +77,85 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "editor.preferences.completion.inline",
     "to.speed.mode.migration.done": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="JUnit.SetServiceTest.restarConjuntosDatosValidosDevuelveDiferencia">
-    <configuration name="SetServiceTest.contieneElementoExistenteDevuelveTrue" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="JUnit.CsvServiceTest">
+    <configuration name="CsvServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.docencia.colecciones.*" />
+          <option name="PATTERN" value="com.docencia.ficheros.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.colecciones" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.SetServiceTest" />
-      <option name="METHOD_NAME" value="contieneElementoExistenteDevuelveTrue" />
+      <option name="PACKAGE_NAME" value="com.docencia.ficheros" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.ficheros.CsvServiceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CsvServiceTest.contarFrecuenciaColumnaDatosValidosDevuelveMapaFrecuencias" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="docencia-bloques-solucion" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.docencia.ficheros.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.docencia.ficheros" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.ficheros.CsvServiceTest" />
+      <option name="METHOD_NAME" value="contarFrecuenciaColumnaDatosValidosDevuelveMapaFrecuencias" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="SetServiceTest.contieneElementoValorNullLanzaExcepcion" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="CsvServiceTest.contarRegistrosCsvFicheroValidoDevuelveCantidad" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.docencia.colecciones.*" />
+          <option name="PATTERN" value="com.docencia.ficheros.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.colecciones" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.SetServiceTest" />
-      <option name="METHOD_NAME" value="contieneElementoValorNullLanzaExcepcion" />
+      <option name="PACKAGE_NAME" value="com.docencia.ficheros" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.ficheros.CsvServiceTest" />
+      <option name="METHOD_NAME" value="contarRegistrosCsvFicheroValidoDevuelveCantidad" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="SetServiceTest.intersectarConjuntosConCoincidenciasDevuelveInterseccion" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="CsvServiceTest.filtrarRegistrosPorValorCoincidenciasDevuelveRegistros" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.docencia.colecciones.*" />
+          <option name="PATTERN" value="com.docencia.ficheros.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.colecciones" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.SetServiceTest" />
-      <option name="METHOD_NAME" value="intersectarConjuntosConCoincidenciasDevuelveInterseccion" />
+      <option name="PACKAGE_NAME" value="com.docencia.ficheros" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.ficheros.CsvServiceTest" />
+      <option name="METHOD_NAME" value="filtrarRegistrosPorValorCoincidenciasDevuelveRegistros" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="SetServiceTest.restarConjuntosDatosValidosDevuelveDiferencia" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="CsvServiceTest.filtrarRegistrosPorValorColumnaInvalidaLanzaExcepcion" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.docencia.colecciones.*" />
+          <option name="PATTERN" value="com.docencia.ficheros.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.colecciones" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.SetServiceTest" />
-      <option name="METHOD_NAME" value="restarConjuntosDatosValidosDevuelveDiferencia" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="SetServiceTest.unirConjuntosDatosValidosDevuelveUnion" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="docencia-bloques-solucion" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.docencia.colecciones.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.colecciones" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.SetServiceTest" />
-      <option name="METHOD_NAME" value="unirConjuntosDatosValidosDevuelveUnion" />
+      <option name="PACKAGE_NAME" value="com.docencia.ficheros" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.ficheros.CsvServiceTest" />
+      <option name="METHOD_NAME" value="filtrarRegistrosPorValorColumnaInvalidaLanzaExcepcion" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -154,11 +163,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.SetServiceTest.restarConjuntosDatosValidosDevuelveDiferencia" />
-        <item itemvalue="JUnit.SetServiceTest.intersectarConjuntosConCoincidenciasDevuelveInterseccion" />
-        <item itemvalue="JUnit.SetServiceTest.unirConjuntosDatosValidosDevuelveUnion" />
-        <item itemvalue="JUnit.SetServiceTest.contieneElementoValorNullLanzaExcepcion" />
-        <item itemvalue="JUnit.SetServiceTest.contieneElementoExistenteDevuelveTrue" />
+        <item itemvalue="JUnit.CsvServiceTest" />
+        <item itemvalue="JUnit.CsvServiceTest.contarFrecuenciaColumnaDatosValidosDevuelveMapaFrecuencias" />
+        <item itemvalue="JUnit.CsvServiceTest.filtrarRegistrosPorValorColumnaInvalidaLanzaExcepcion" />
+        <item itemvalue="JUnit.CsvServiceTest.filtrarRegistrosPorValorCoincidenciasDevuelveRegistros" />
+        <item itemvalue="JUnit.CsvServiceTest.contarRegistrosCsvFicheroValidoDevuelveCantidad" />
       </list>
     </recent_temporary>
   </component>
@@ -182,5 +191,9 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>
