@@ -8,32 +8,37 @@ public class SetServiceImpl implements SetService {
 
     @Override
     public Set<String> obtenerElementosUnicos(List<String> elementos) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'obtenerElementosUnicos'");
+        Set<String> elementosUnicos = new LinkedHashSet<>();
+        elementosUnicos.addAll(elementos);
+        return elementosUnicos;
     }
 
     @Override
     public Boolean contieneElemento(Set<String> elementos, String valor) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'contieneElemento'");
+        if(valor == null) throw new IllegalArgumentException();
+        return elementos.contains(valor);
     }
 
     @Override
     public Set<String> unirConjuntos(Set<String> primero, Set<String> segundo) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'unirConjuntos'");
+        Set<String> resultado = new LinkedHashSet<>();
+        resultado.addAll(primero);
+        resultado.addAll(segundo);
+        return resultado;
     }
 
     @Override
     public Set<String> intersectarConjuntos(Set<String> primero, Set<String> segundo) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'intersectarConjuntos'");
+        Set<String> resultado = new LinkedHashSet<>(primero);
+        resultado.retainAll(segundo);
+        return resultado;
     }
 
     @Override
     public Set<String> restarConjuntos(Set<String> primero, Set<String> segundo) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'restarConjuntos'");
+        Set<String> resultado = new LinkedHashSet<>(primero);
+        resultado.removeAll(segundo);
+        return resultado;
     }
     
 }
