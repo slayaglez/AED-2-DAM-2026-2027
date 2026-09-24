@@ -5,10 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b316e171-1693-4dfd-a801-4a6177e89780" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/herencia/HerenciaService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/herencia/HerenciaService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/numeros/IntegerServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/numeros/IntegerServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/docencia/numeros/IntegerServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/docencia/numeros/IntegerServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/numeros/MathServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/numeros/MathServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,6 +38,8 @@
     "JUnit.HerenciaServiceTest.executor": "Run",
     "JUnit.IfElseServiceTest.executor": "Run",
     "JUnit.IfElseServiceTest.puedeAccederActivoYMayorDevuelveTrue.executor": "Run",
+    "JUnit.IntegerServiceTest.calcularFactorialNumeroNegativoLanzaExcepcion.executor": "Run",
+    "JUnit.IntegerServiceTest.esParNumeroNullLanzaExcepcion.executor": "Run",
     "JUnit.IntegerServiceTest.executor": "Run",
     "JUnit.IntegerServiceTest.sumarDigitosNumeroNegativoDevuelveSuma.executor": "Run",
     "JUnit.ListServiceTest.calcularMediaListaDatosValidosDevuelveMedia.executor": "Run",
@@ -60,6 +59,7 @@
     "JUnit.MapServiceTest.obtenerClaveConMayorValorDatosValidosDevuelveClave.executor": "Run",
     "JUnit.MapServiceTest.obtenerClaveConMayorValorMapaVacioLanzaExcepcion.executor": "Run",
     "JUnit.MapServiceTest.obtenerValorPorClaveClaveInexistenteDevuelveCero.executor": "Run",
+    "JUnit.MathServiceTest.executor": "Run",
     "JUnit.SetServiceTest.contieneElementoExistenteDevuelveTrue.executor": "Run",
     "JUnit.SetServiceTest.contieneElementoValorNullLanzaExcepcion.executor": "Run",
     "JUnit.SetServiceTest.intersectarConjuntosConCoincidenciasDevuelveInterseccion.executor": "Run",
@@ -86,22 +86,7 @@
     "to.speed.mode.migration.done": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="JUnit.IntegerServiceTest.calcularFactorialNumeroNegativoLanzaExcepcion">
-    <configuration name="HerenciaServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="docencia-bloques-solucion" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.docencia.herencia.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.herencia" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.herencia.HerenciaServiceTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="JUnit.MathServiceTest">
     <configuration name="IntegerServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
@@ -149,7 +134,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="IntegerServiceTest.sumarDigitosNumeroNegativoDevuelveSuma" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="MathServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
@@ -158,8 +143,23 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="com.docencia.numeros" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.numeros.IntegerServiceTest" />
-      <option name="METHOD_NAME" value="sumarDigitosNumeroNegativoDevuelveSuma" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.numeros.MathServiceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MathServiceTest.redondearHaciaArribaDecimalDevuelveEnteroSuperior" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="docencia-bloques-solucion" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.docencia.numeros.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.docencia.numeros" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.numeros.MathServiceTest" />
+      <option name="METHOD_NAME" value="redondearHaciaArribaDecimalDevuelveEnteroSuperior" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -167,11 +167,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.MathServiceTest" />
+        <item itemvalue="JUnit.MathServiceTest.redondearHaciaArribaDecimalDevuelveEnteroSuperior" />
         <item itemvalue="JUnit.IntegerServiceTest.calcularFactorialNumeroNegativoLanzaExcepcion" />
         <item itemvalue="JUnit.IntegerServiceTest" />
         <item itemvalue="JUnit.IntegerServiceTest.esParNumeroNullLanzaExcepcion" />
-        <item itemvalue="JUnit.IntegerServiceTest.sumarDigitosNumeroNegativoDevuelveSuma" />
-        <item itemvalue="JUnit.HerenciaServiceTest" />
       </list>
     </recent_temporary>
   </component>

@@ -4,32 +4,28 @@ public class MathServiceImpl implements MathService {
 
     @Override
     public Double calcularAreaCirculo(Double radio) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'calcularAreaCirculo'");
+        if(radio <= 0) throw new IllegalArgumentException();
+        return Math.PI * Math.pow(radio, 2);
     }
 
     @Override
     public Integer calcularPotencia(Integer base, Integer exponente) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'calcularPotencia'");
+        return (int) Math.pow(base, exponente);
     }
 
     @Override
     public Integer redondearHaciaArriba(Double numero) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'redondearHaciaArriba'");
+        return (int) Math.ceil(numero);
     }
 
     @Override
     public Double calcularRaizCuadrada(Double numero) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'calcularRaizCuadrada'");
+        return Math.sqrt(numero);
     }
 
     @Override
     public Integer obtenerValorAbsoluto(Integer numero) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'obtenerValorAbsoluto'");
+        return Math.abs(numero);
     }
     
 }
