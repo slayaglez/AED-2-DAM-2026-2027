@@ -6,8 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="b316e171-1693-4dfd-a801-4a6177e89780" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/cadenas/StringServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/cadenas/StringServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/docencia/cadenas/StringServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/docencia/cadenas/StringServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/regex/RegexServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/regex/RegexServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/docencia/regex/RegexServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/docencia/regex/RegexServiceImpl.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,14 +63,26 @@
     "JUnit.MapServiceTest.obtenerValorPorClaveClaveInexistenteDevuelveCero.executor": "Run",
     "JUnit.MathServiceTest.executor": "Run",
     "JUnit.MathServiceTest.redondearHaciaArribaDecimalDevuelveEnteroSuperior.executor": "Run",
+    "JUnit.RegexServiceTest.validarDniFormatoInvalidoDevuelveFalse.executor": "Run",
+    "JUnit.RegexServiceTest.validarDniFormatoValidoDevuelveTrue.executor": "Run",
+    "JUnit.RegexServiceTest.validarDniTextoNullDevuelveFalse.executor": "Run",
+    "JUnit.RegexServiceTest.validarEmailFormatoInvalidoDevuelveFalse.executor": "Run",
+    "JUnit.RegexServiceTest.validarEmailFormatoValidoDevuelveTrue.executor": "Run",
+    "JUnit.RegexServiceTest.validarNombreFormatoValidoDevuelveTrue.executor": "Run",
+    "JUnit.RegexServiceTest.validarTelefonoFormatoInvalidoDevuelveFalse.executor": "Run",
+    "JUnit.RegexServiceTest.validarTelefonoFormatoValidoDevuelveTrue.executor": "Run",
     "JUnit.SetServiceTest.contieneElementoExistenteDevuelveTrue.executor": "Run",
     "JUnit.SetServiceTest.contieneElementoValorNullLanzaExcepcion.executor": "Run",
     "JUnit.SetServiceTest.intersectarConjuntosConCoincidenciasDevuelveInterseccion.executor": "Run",
     "JUnit.SetServiceTest.obtenerElementosUnicosConDuplicadosDevuelveSetSinDuplicados.executor": "Run",
     "JUnit.SetServiceTest.restarConjuntosDatosValidosDevuelveDiferencia.executor": "Run",
     "JUnit.SetServiceTest.unirConjuntosDatosValidosDevuelveUnion.executor": "Run",
+    "JUnit.StringServiceTest.contarVocalesTextoValidoDevuelveCantidad.executor": "Run",
+    "JUnit.StringServiceTest.esPalindromoIgnorandoEspaciosDevuelveTrue.executor": "Run",
     "JUnit.StringServiceTest.executor": "Run",
     "JUnit.StringServiceTest.extraerInicialesNombreCompletoDevuelveIniciales.executor": "Run",
+    "JUnit.StringServiceTest.normalizarTextoConEspaciosDevuelveTextoLimpio.executor": "Run",
+    "JUnit.StringServiceTest.normalizarTextoTextoNullLanzaExcepcion.executor": "Run",
     "JUnit.SwitchServiceTest.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -91,81 +103,81 @@
     "to.speed.mode.migration.done": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="JUnit.StringServiceTest">
-    <configuration name="StringServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="JUnit.RegexServiceTest">
+    <configuration name="RegexServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.docencia.cadenas.*" />
+          <option name="PATTERN" value="com.docencia.regex.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.cadenas" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.cadenas.StringServiceTest" />
+      <option name="PACKAGE_NAME" value="com.docencia.regex" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.regex.RegexServiceTest" />
       <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="StringServiceTest.contarVocalesTextoValidoDevuelveCantidad" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="RegexServiceTest.validarNombreFormatoValidoDevuelveTrue" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.docencia.cadenas.*" />
+          <option name="PATTERN" value="com.docencia.regex.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.cadenas" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.cadenas.StringServiceTest" />
-      <option name="METHOD_NAME" value="contarVocalesTextoValidoDevuelveCantidad" />
+      <option name="PACKAGE_NAME" value="com.docencia.regex" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.regex.RegexServiceTest" />
+      <option name="METHOD_NAME" value="validarNombreFormatoValidoDevuelveTrue" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="StringServiceTest.esPalindromoIgnorandoEspaciosDevuelveTrue" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="RegexServiceTest.validarNombreMuyCortoDevuelveFalse" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.docencia.cadenas.*" />
+          <option name="PATTERN" value="com.docencia.regex.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.cadenas" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.cadenas.StringServiceTest" />
-      <option name="METHOD_NAME" value="esPalindromoIgnorandoEspaciosDevuelveTrue" />
+      <option name="PACKAGE_NAME" value="com.docencia.regex" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.regex.RegexServiceTest" />
+      <option name="METHOD_NAME" value="validarNombreMuyCortoDevuelveFalse" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="StringServiceTest.normalizarTextoConEspaciosDevuelveTextoLimpio" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="RegexServiceTest.validarTelefonoFormatoInvalidoDevuelveFalse" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.docencia.cadenas.*" />
+          <option name="PATTERN" value="com.docencia.regex.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.cadenas" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.cadenas.StringServiceTest" />
-      <option name="METHOD_NAME" value="normalizarTextoConEspaciosDevuelveTextoLimpio" />
+      <option name="PACKAGE_NAME" value="com.docencia.regex" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.regex.RegexServiceTest" />
+      <option name="METHOD_NAME" value="validarTelefonoFormatoInvalidoDevuelveFalse" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="StringServiceTest.normalizarTextoTextoNullLanzaExcepcion" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="RegexServiceTest.validarTelefonoFormatoValidoDevuelveTrue" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.docencia.cadenas.*" />
+          <option name="PATTERN" value="com.docencia.regex.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.cadenas" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.cadenas.StringServiceTest" />
-      <option name="METHOD_NAME" value="normalizarTextoTextoNullLanzaExcepcion" />
+      <option name="PACKAGE_NAME" value="com.docencia.regex" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.regex.RegexServiceTest" />
+      <option name="METHOD_NAME" value="validarTelefonoFormatoValidoDevuelveTrue" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -173,11 +185,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.StringServiceTest" />
-        <item itemvalue="JUnit.StringServiceTest.normalizarTextoTextoNullLanzaExcepcion" />
-        <item itemvalue="JUnit.StringServiceTest.esPalindromoIgnorandoEspaciosDevuelveTrue" />
-        <item itemvalue="JUnit.StringServiceTest.contarVocalesTextoValidoDevuelveCantidad" />
-        <item itemvalue="JUnit.StringServiceTest.normalizarTextoConEspaciosDevuelveTextoLimpio" />
+        <item itemvalue="JUnit.RegexServiceTest" />
+        <item itemvalue="JUnit.RegexServiceTest.validarNombreMuyCortoDevuelveFalse" />
+        <item itemvalue="JUnit.RegexServiceTest.validarNombreFormatoValidoDevuelveTrue" />
+        <item itemvalue="JUnit.RegexServiceTest.validarTelefonoFormatoInvalidoDevuelveFalse" />
+        <item itemvalue="JUnit.RegexServiceTest.validarTelefonoFormatoValidoDevuelveTrue" />
       </list>
     </recent_temporary>
   </component>

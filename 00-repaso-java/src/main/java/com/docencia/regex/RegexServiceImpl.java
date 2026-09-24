@@ -4,38 +4,39 @@ public class RegexServiceImpl implements RegexService {
 
     @Override
     public Boolean validarDni(String dni) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'validarDni'");
+        if(dni==null) return false;
+        String regex = "[0-9]{8}[A-Z]";
+        return dni.matches(regex);
     }
 
     @Override
     public Boolean validarEmail(String email) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'validarEmail'");
+        String regex = "[a-z]+@[a-z]+\\.[a-z]+";
+        return email.matches(regex);
     }
 
     @Override
     public Boolean validarTelefono(String telefono) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'validarTelefono'");
+        String regex = "6[0-9]{8}";
+        return telefono.matches(regex);
     }
 
     @Override
     public Boolean validarNombre(String nombre) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'validarNombre'");
+        String regex = "([a-zA-Záéíóú]{2,})(\\s([a-zA-Záéíóú]{2,}))?";
+        return nombre.matches(regex);
     }
 
     @Override
     public Boolean validarCodigoPostal(String codigoPostal) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'validarCodigoPostal'");
+        String regex = "[0-9]{5}";
+        return codigoPostal.matches(regex);
     }
 
     @Override
     public Boolean validarMatricula(String matricula) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'validarMatricula'");
+        String regex = "[0-9]{4}[A-Z]{3}";
+        return matricula.matches(regex);
     }
     
 }
