@@ -6,6 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="b316e171-1693-4dfd-a801-4a6177e89780" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/colecciones/ListService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/colecciones/ListService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/docencia/colecciones/ListServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/docencia/colecciones/ListServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/docencia/colecciones/ListServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/docencia/colecciones/ListServiceImpl.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,12 +31,15 @@
   "keyToString": {
     "JUnit.IfElseServiceTest.executor": "Run",
     "JUnit.IfElseServiceTest.puedeAccederActivoYMayorDevuelveTrue.executor": "Run",
+    "JUnit.ListServiceTest.calcularMediaListaDatosValidosDevuelveMedia.executor": "Run",
+    "JUnit.ListServiceTest.calcularMediaListaListaVaciaLanzaExcepcion.executor": "Run",
     "JUnit.ListServiceTest.eliminarNumerosDuplicadosConDuplicadosDevuelveListaSinDuplicados.executor": "Run",
     "JUnit.ListServiceTest.executor": "Run",
     "JUnit.ListServiceTest.filtrarPalabrasPorLongitudDatosValidosDevuelveListaFiltrada.executor": "Run",
     "JUnit.ListServiceTest.filtrarPalabrasPorLongitudListaVaciaDevuelveListaVacia.executor": "Run",
     "JUnit.ListServiceTest.filtrarPalabrasPorLongitudLongitudInvalidaLanzaExcepcion.executor": "Run",
     "JUnit.ListServiceTest.ordenarNumerosAscendenteDatosValidosDevuelveListaOrdenada.executor": "Run",
+    "JUnit.ListServiceTest.sumarElementosListaDatosValidosDevuelveSuma.executor": "Run",
     "JUnit.SwitchServiceTest.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -53,38 +59,7 @@
     "to.speed.mode.migration.done": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="JUnit.SwitchServiceTest">
-    <configuration name="IfElseServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="docencia-bloques-solucion" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.docencia.condicionales.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.condicionales" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.condicionales.IfElseServiceTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="IfElseServiceTest.puedeAccederActivoYMayorDevuelveTrue" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="docencia-bloques-solucion" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.docencia.condicionales.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.condicionales" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.condicionales.IfElseServiceTest" />
-      <option name="METHOD_NAME" value="puedeAccederActivoYMayorDevuelveTrue" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="JUnit.ListServiceTest">
     <configuration name="ListServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
@@ -96,6 +71,38 @@
       <option name="PACKAGE_NAME" value="com.docencia.colecciones" />
       <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.ListServiceTest" />
       <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ListServiceTest.calcularMediaListaDatosValidosDevuelveMedia" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="docencia-bloques-solucion" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.docencia.colecciones.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.docencia.colecciones" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.ListServiceTest" />
+      <option name="METHOD_NAME" value="calcularMediaListaDatosValidosDevuelveMedia" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ListServiceTest.calcularMediaListaListaVaciaLanzaExcepcion" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="docencia-bloques-solucion" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.docencia.colecciones.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.docencia.colecciones" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.ListServiceTest" />
+      <option name="METHOD_NAME" value="calcularMediaListaListaVaciaLanzaExcepcion" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -116,28 +123,29 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="SwitchServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="ListServiceTest.sumarElementosListaDatosValidosDevuelveSuma" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="docencia-bloques-solucion" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.docencia.condicionales.*" />
+          <option name="PATTERN" value="com.docencia.colecciones.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.docencia.condicionales" />
-      <option name="MAIN_CLASS_NAME" value="com.docencia.condicionales.SwitchServiceTest" />
-      <option name="TEST_OBJECT" value="class" />
+      <option name="PACKAGE_NAME" value="com.docencia.colecciones" />
+      <option name="MAIN_CLASS_NAME" value="com.docencia.colecciones.ListServiceTest" />
+      <option name="METHOD_NAME" value="sumarElementosListaDatosValidosDevuelveSuma" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.SwitchServiceTest" />
-        <item itemvalue="JUnit.IfElseServiceTest.puedeAccederActivoYMayorDevuelveTrue" />
-        <item itemvalue="JUnit.IfElseServiceTest" />
         <item itemvalue="JUnit.ListServiceTest" />
         <item itemvalue="JUnit.ListServiceTest.eliminarNumerosDuplicadosConDuplicadosDevuelveListaSinDuplicados" />
+        <item itemvalue="JUnit.ListServiceTest.calcularMediaListaListaVaciaLanzaExcepcion" />
+        <item itemvalue="JUnit.ListServiceTest.calcularMediaListaDatosValidosDevuelveMedia" />
+        <item itemvalue="JUnit.ListServiceTest.sumarElementosListaDatosValidosDevuelveSuma" />
       </list>
     </recent_temporary>
   </component>

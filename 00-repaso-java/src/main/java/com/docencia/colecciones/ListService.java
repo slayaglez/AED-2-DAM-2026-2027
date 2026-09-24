@@ -4,6 +4,7 @@ import java.util.List;
 
 /**
  * Servicio para trabajar con listas.
+ * Esto ya vino comentado, por eso hay tildes, no lo voy a editar
  */
 public interface ListService {
     /**

@@ -8,32 +8,51 @@ public class ListServiceImpl implements ListService {
 
     @Override
     public List<String> filtrarPalabrasPorLongitud(List<String> palabras, Integer longitudMinima) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'filtrarPalabrasPorLongitud'");
+        if(longitudMinima <= 0) throw new IllegalArgumentException();
+
+        List<String> resultado = new ArrayList<>();
+        for(String palabra: palabras) {
+            if(longitudMinima <= palabra.length()) {
+                resultado.add(palabra);
+            }
+        }
+        return resultado;
     }
 
     @Override
     public List<Integer> ordenarNumerosAscendente(List<Integer> numeros) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'ordenarNumerosAscendente'");
+        return numeros.stream().sorted().toList();
     }
 
     @Override
     public Integer sumarElementosLista(List<Integer> numeros) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'sumarElementosLista'");
+        Integer resultado = numeros.get(0);
+        for (int i = 1; i < numeros.size(); i++) {
+            resultado += numeros.get(i);
+        }
+        return resultado;
     }
 
     @Override
     public Double calcularMediaLista(List<Integer> numeros) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'calcularMediaLista'");
+        if(numeros.isEmpty()) throw new IllegalArgumentException();
+
+        Double resultado = numeros.get(0).doubleValue();
+        for (int i = 1; i < numeros.size(); i++) {
+            resultado += numeros.get(i);
+        }
+        return resultado/numeros.size();
     }
 
     @Override
     public List<Integer> eliminarNumerosDuplicados(List<Integer> numeros) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'eliminarNumerosDuplicados'");
+        List<Integer> resultado = new ArrayList<>();
+        for(Integer numero: numeros) {
+            if(!resultado.contains(numero)) {
+                resultado.add(numero);
+            }
+        }
+        return resultado;
     }
    
 }
