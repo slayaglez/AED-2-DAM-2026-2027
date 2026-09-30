@@ -1,4 +1,4 @@
-package com.ejemplo.catalogo.repository.file.csv;
+package com.ejemplo.catalogo.repository.file;
 
 import com.ejemplo.catalogo.model.Producto;
 import com.fasterxml.jackson.core.type.TypeReference;

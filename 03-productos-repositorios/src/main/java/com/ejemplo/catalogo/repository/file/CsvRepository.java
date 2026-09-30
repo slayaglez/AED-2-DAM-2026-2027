@@ -1,4 +1,4 @@
-package com.ejemplo.catalogo.repository.file.csv;
+package com.ejemplo.catalogo.repository.file;
 
 import com.ejemplo.catalogo.model.Producto;
 import org.apache.commons.csv.CSVFormat;
@@ -46,10 +46,6 @@ public class CsvRepository extends AbstractRepository {
         }
         return productos;
     }
-
-
-
-
 
     @Override
     public void saveAll(List<Producto> items)  {
