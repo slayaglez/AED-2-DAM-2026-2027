@@ -1,6 +1,5 @@
 package com.ejemplo.catalogo.repository.file.csv;
 
-import com.ejemplo.catalogo.CsvCrud;
 import com.ejemplo.catalogo.model.Producto;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -13,14 +12,10 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.logging.Logger;
 
-public class CsvRepository extends AbstractRepository implements IRepository{
-    private Path path;
-    //Logger logger = new Logger();
+public class CsvRepository extends AbstractRepository {
+
     private final CSVFormat inputFormat = CSVFormat.DEFAULT.builder()
             .setHeader()
             .setSkipHeaderRecord(true)
@@ -29,6 +24,7 @@ public class CsvRepository extends AbstractRepository implements IRepository{
             .setHeader("id", "nombre", "precio")
             .get();
 
+
     CsvRepository(Path path) {
         super(path);
         productos = load();
@@ -36,7 +32,8 @@ public class CsvRepository extends AbstractRepository implements IRepository{
 
     @Override
     public List<Producto> load() {
-        try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
+
+        try (Reader reader = Files.newBufferedReader(getPath(), StandardCharsets.UTF_8);
              CSVParser parser = inputFormat.parse(reader)) {
             for (CSVRecord row : parser) {
                 productos.add(new Producto(
@@ -44,24 +41,25 @@ public class CsvRepository extends AbstractRepository implements IRepository{
                         row.get("nombre"),
                         Double.parseDouble(row.get("precio"))));
             }
-        } catch (IOException e){
-            //throw new RuntimeException(e);
+        } catch (IOException e) {
+            //Logger.ERROR //FINE
         }
         return productos;
     }
 
-    @Override
-    public List<Producto> findAll() {
-        return productos;
-    }
+
+
+
 
     @Override
-    public void saveAll(List<Producto> items ){
+    public void saveAll(List<Producto> items)  {
+
         try (Writer writer = Files.newBufferedWriter(getPath(), StandardCharsets.UTF_8);
              CSVPrinter printer = new CSVPrinter(writer, outputFormat)) {
             for (Producto p : items) printer.printRecord(p.id(), p.nombre(), p.precio());
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
     }
 }

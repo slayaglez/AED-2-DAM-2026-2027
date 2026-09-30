@@ -1,5 +1,3 @@
-package com.ejemplo.catalogo;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -15,8 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class CsvCrud {
-    public record Producto(long id, String nombre, double precio) {}
+public class CsvCrudDemo {
+    public record Producto(long id, String nombre, double precio) {
+
+    }
 
     private final Path path;
     private final CSVFormat inputFormat = CSVFormat.DEFAULT.builder()
@@ -27,7 +27,7 @@ public class CsvCrud {
             .setHeader("id", "nombre", "precio")
             .get();
 
-    public CsvCrud(Path path) { this.path = path; }
+    public CsvCrudDemo(Path path) { this.path = path; }
 
     public List<Producto> findAll() throws IOException {
         if (Files.notExists(path)) return new ArrayList<>();
@@ -85,7 +85,7 @@ public class CsvCrud {
     }
 
     public static void main(String[] args) throws IOException {
-        CsvCrud repo = new CsvCrud(Path.of("data", "productos.csv"));
+        CsvCrudDemo repo = new CsvCrudDemo(Path.of("data", "productos.csv"));
         repo.create(new Producto(1, "Teclado", 49.99));
         repo.create(new Producto(2, "Monitor, 27 pulgadas", 219.90));
         System.out.println(repo.findById(2).orElseThrow());
