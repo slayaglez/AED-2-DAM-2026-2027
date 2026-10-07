@@ -4,28 +4,43 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TextFileService {
 
     public boolean escribir(Path path, String contenido) {
         try {
-            Files.writeString(path, StandardCharsets.UTF_8);
+            Files.writeString(path, contenido);
+            return true;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return false;
         }
     }
 
     public String leer(Path path) {
-        throw new UnsupportedOperationException("Función no implementada");
+        try {
+            return Files.readString(path);
+        } catch (IOException e) {
+            return "";
+        }
     }
 
     public boolean escribirLineas(Path path, List<String> lineas) {
-        throw new UnsupportedOperationException("Función no implementada");
+        try {
+            Files.write(path, lineas);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     public List<String> leerLineas(Path path) {
-        throw new UnsupportedOperationException("Función no implementada");
+        try {
+            return Files.readAllLines(path);
+        } catch (IOException e) {
+            return new ArrayList<>();
+        }
     }
 
     public boolean anexar(Path path, String contenido) {
