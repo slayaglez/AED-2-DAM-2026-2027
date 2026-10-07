@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +45,11 @@ public class TextFileService {
     }
 
     public boolean anexar(Path path, String contenido) {
-        throw new UnsupportedOperationException("Función no implementada");
+        try {
+            Files.writeString(path, contenido, StandardOpenOption.APPEND);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
 }

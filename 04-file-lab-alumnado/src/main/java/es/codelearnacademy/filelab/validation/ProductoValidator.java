@@ -8,6 +8,11 @@ public final class ProductoValidator {
     }
 
     public static void validar(Producto producto) {
-        throw new UnsupportedOperationException("Función no implementada");
+        if(producto == null){throw new IllegalArgumentException("Producto inválido");}
+        if(producto.id() <= 0){throw new IllegalArgumentException("Producto inválido");}
+        if(producto.nombre() == null){throw new IllegalArgumentException("Producto inválido");}
+        if(producto.nombre().isBlank()){throw new IllegalArgumentException("Producto inválido");}
+        if(producto.precio() < 0){throw new IllegalArgumentException("Producto inválido");}
+        if(producto.stock() < 0){throw new IllegalArgumentException("Producto inválido");}
     }
 }
