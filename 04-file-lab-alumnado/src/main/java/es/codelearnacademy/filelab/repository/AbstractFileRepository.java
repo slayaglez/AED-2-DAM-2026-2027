@@ -8,27 +8,59 @@ public abstract class AbstractFileRepository<T, ID> implements IRepository<T, ID
 
     @Override
     public List<T> findAll() {
-        throw new UnsupportedOperationException("Función no implementada");
+        try {
+            return readAll();
+        } catch (IOException e) {
+            return List.of();
+        }
     }
 
     @Override
     public Optional<T> findById(ID id) {
-        throw new UnsupportedOperationException("Función no implementada");
+        try {
+            return readAll().stream().filter(t -> getId(t).equals(id)).findFirst();
+        } catch (IOException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
     public boolean create(T entity) {
-        throw new UnsupportedOperationException("Función no implementada");
+        List<T> all = findAll();
+        all.add(entity);
+        try {
+            writeAll(all);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     @Override
     public boolean update(T entity) {
-        throw new UnsupportedOperationException("Función no implementada");
+        List<T> all = findAll();
+        delete(getId(entity));
+        all.add(entity);
+        try {
+            writeAll(all);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     @Override
     public boolean delete(ID id) {
-        throw new UnsupportedOperationException("Función no implementada");
+        List<T> all = findAll();
+        Optional<T> outdated = findById(id);
+
+        try {
+            all.remove(outdated);
+            writeAll(all);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     protected abstract ID getId(T entity);
