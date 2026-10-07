@@ -38,12 +38,16 @@ public abstract class AbstractFileRepository<T, ID> implements IRepository<T, ID
 
     @Override
     public boolean update(T entity) {
-        List<T> all = findAll();
-        delete(getId(entity));
-        all.add(entity);
         try {
-            writeAll(all);
-            return true;
+            List<T> all = readAll();
+            for (int i = 0; i < all.size(); i++) {
+                if (getId(all.get(i)).equals(getId(entity))) {
+                    all.set(i, entity);
+                    writeAll(all);
+                    return true;
+                }
+            }
+            return false;
         } catch (IOException e) {
             return false;
         }
@@ -52,10 +56,9 @@ public abstract class AbstractFileRepository<T, ID> implements IRepository<T, ID
     @Override
     public boolean delete(ID id) {
         List<T> all = findAll();
-        Optional<T> outdated = findById(id);
 
         try {
-            all.remove(outdated);
+            all.removeIf(t -> getId(t).equals(id));
             writeAll(all);
             return true;
         } catch (IOException e) {
