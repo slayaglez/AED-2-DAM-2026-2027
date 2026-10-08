@@ -1,15 +1,12 @@
 package es.codelearnacademy.filelab.config;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.file.*;
+import java.util.*;
 
 public class PropertiesConfig {
-
     private final Path path;
     private static Properties props;
 
@@ -19,7 +16,7 @@ public class PropertiesConfig {
     }
 
     public Optional<String> get(String key) {
-        try(Reader reader = Files.newBufferedReader(path)){
+        try (Reader reader = Files.newBufferedReader(path)) {
             props.load(reader);
             return Optional.ofNullable(props.getProperty(key));
         } catch (IOException e) {
@@ -33,9 +30,9 @@ public class PropertiesConfig {
 
     public Map<String, String> findAll() {
         Map<String, String> all = new HashMap<>();
-        try(Reader reader = Files.newBufferedReader(path)){
+        try (Reader reader = Files.newBufferedReader(path)) {
             props.load(reader);
-            for (String key : props.stringPropertyNames()){
+            for (String key : props.stringPropertyNames()) {
                 all.put(key, props.getProperty(key));
             }
             return all;
@@ -45,15 +42,21 @@ public class PropertiesConfig {
     }
 
     public boolean put(String key, String value) {
-        try (Writer writer = Files.newBufferedWriter(path)){
+
+        try (Writer writer = Files.newBufferedWriter(path)) {
             props.setProperty(key, value);
-            props.load(writer);
+            return true;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     public boolean remove(String key) {
-        throw new UnsupportedOperationException("Función no implementada");
+        try (Writer writer = Files.newBufferedWriter(path)) {
+            props.remove(key);
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

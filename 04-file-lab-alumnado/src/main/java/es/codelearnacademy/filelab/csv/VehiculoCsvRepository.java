@@ -19,7 +19,7 @@ public class VehiculoCsvRepository
 
     @Override
     protected String getId(Vehiculo vehiculo) {
-        throw new UnsupportedOperationException("Función no implementada");
+        return vehiculo.matricula();
     }
 
     @Override
