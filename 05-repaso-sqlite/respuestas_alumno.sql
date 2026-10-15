@@ -4,24 +4,23 @@
 
 -- EJERCICIO 01
 -- Mostrar los cinco primeros productos por identificador.
-SELECT ...;
--- SELECT id, nombre, precio FROM Productos ORDER BY id LIMIT 5;
+SELECT id, nombre, precio FROM productos ORDER BY id LIMIT 5;
 
 -- EJERCICIO 02
 -- Ver los cinco vehículos más recientes.
-SELECT ...;
+SELECT matricula, marca, modelo, anio FROM vehiculos ORDER BY anio DESC LIMIT 5;
 
 -- EJERCICIO 03
 -- Filtrar productos cuyo precio sea mayor de 100.
-SELECT ...;
+SELECT id, nombre, precio FROM productos WHERE precio > 100.0 ORDER BY precio DESC LIMIT 8;
 
 -- EJERCICIO 04
 -- Localizar vehículos de la marca Toyota.
-SELECT ...;
+SELECT matricula, marca, modelo, anio FROM vehiculos WHERE marca LIKE 'Toyota' ORDER BY anio DESC LIMIT 8;
 
 -- EJERCICIO 05
 -- Buscar productos cuyo nombre contenga Pro.
-SELECT ...;
+SELECT * FROM productos WHERE nombre IN 'Pro';
 
 -- EJERCICIO 06
 -- Mostrar productos con precio comprendido entre 20 y 50.
