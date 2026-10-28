@@ -1,438 +1,1452 @@
-# Taller mecánico — proyecto para el alumnado
+# Taller mecánico — Guía de construcción paso a paso (JDBC → JPA / Hibernate)
 
-## 1. Objetivo del ejercicio
+>  Esta guía permite construir la solución de manera gradual y entender **por qué** se escribe cada clase, no solo copiar el resultado. Parte del proyecto `taller-mecanico-alumnado` y sigue la progresión de [Persistencia relacional y ORM con Java y SQLite](https://codelearnacademy.github.io/orm/): SQL → JDBC → mapeo manual → entidades JPA → `EntityManager` → repositorios → consultas → pruebas.
 
-Implementar el acceso a datos de un taller mecánico con **Java 21, JDBC, SQLite y Maven**, utilizando consultas parametrizadas y pruebas automatizadas con JUnit 5.
+## 0. Qué vas a aprender y cómo utilizar esta guía
 
-Al finalizar deberás ser capaz de:
+Al terminar podrás identificar tablas y claves, convertir tablas en entidades Java, configurar Hibernate, comprender las relaciones entre objetos y claves foráneas, gestionar el ciclo de vida de `EntityManager`, implementar CRUD con transacciones y escribir consultas JPQL con parámetros. También aprenderás a separar el **modelo de dominio** (`modelo`) de las **entidades de persistencia** (`orm/entity`).
 
-- Interpretar un modelo relacional e identificar claves primarias, únicas y foráneas.
-- Escribir consultas SQL con filtros, relaciones y agregaciones.
-- Implementar operaciones CRUD mediante el patrón DAO.
-- Transformar filas de un `ResultSet` en objetos Java.
-- Utilizar `List`, `Optional` y `BigDecimal` correctamente.
-- Gestionar conexiones, sentencias, resultados y errores.
-- Comprobar el comportamiento de una aplicación mediante pruebas aisladas.
-- Reconocer código repetido e implementar una refactorización con una clase abstracta.
+**Método de trabajo:** en cada fase (1) lee el objetivo, (2) crea o modifica los archivos, (3) ejecuta la comprobación, (4) contesta las preguntas. No empieces por la capa ORM si no comprendes antes las consultas SQL y las claves foráneas.
 
-**El proyecto contiene los modelos y las firmas de los DAO (definición de las funciones, que están pendientes de implementar).
+**Requisitos:** JDK 17 o posterior, Maven 3.9 o posterior, IDE Java y SQLite (CLI o visor de bases de datos opcional). El proyecto incluye bases SQLite en `datos/`, y su esquema en `src/main/resources/schema.sql`.
 
-## 2. Requisitos y puesta en marcha
+> **Precaución:** trabaja siempre sobre una **copia** de `datos/taller.sqlite3`, por ejemplo `datos/taller-practicas.sqlite3`. La aplicación puede modificar los registros de esa copia. No uses la base de test original para pruebas manuales.
 
-Necesitas un JDK 21 y Maven disponibles, y un editor o IDE compatible con proyectos Maven. Maven gestiona las dependencias declaradas en `pom.xml`: SQLite JDBC y JUnit Jupiter.
+## 1. Reconoce los archivos del proyecto
 
-Para limpiar resultados anteriores y repetir la ejecución:
+```text
+pom.xml
+src/main/java/es/ejemplo/taller/
+├── modelo/                   # Objetos de dominio existentes
+│   ├── Cliente.java
+│   ├── Vehiculo.java
+│   ├── Mecanico.java
+│   ├── Reparacion.java
+│   └── PiezaReparacion.java
+├── infra/ConexionBD.java    # Acceso JDBC existente
+├── dao/                      # DAO JDBC existentes
+└── orm/
+    ├── config/OrmFactory.java
+    ├── entity/               # 5 entidades JPA
+    ├── mapper/               # 5 mappers
+    ├── repository/           # IRepository, CRUD y consultas específicas
+    └── DemoOrm.java
+src/main/resources/
+├── META-INF/persistence.xml
+└── schema.sql
+datos/taller.sqlite3
+src/test/java/es/ejemplo/taller/  # Pruebas JDBC originales
+```
+
+**Propuesta para el aula:** si recibes el ZIP que ya incluye `orm/`, oculta temporalmente esa carpeta o utilízala solo al finalizar cada práctica para comparar tu implementación. La guía está pensada para escribir los archivos **en este orden**.
+
+## 2. Analiza el modelo relacional antes de programar
+
+Abre `schema.sql` y localiza las cinco tablas. Identifica para cada una su clave primaria (PK) y las claves foráneas (FK):
+
+| Tabla | PK | FK | Relación lógica |
+|---|---|---|---|
+| `clientes` | `id_cliente` (entero autogenerado) | — | Un cliente puede tener muchos vehículos |
+| `vehiculos` | `matricula` (texto asignado) | `id_cliente → clientes.id_cliente` | Cada vehículo pertenece a un cliente |
+| `mecanicos` | `id_mecanico` (entero autogenerado) | — | Un mecánico interviene en muchas reparaciones |
+| `reparaciones` | `id_reparacion` (entero autogenerado) | `matricula → vehiculos.matricula`, `id_mecanico → mecanicos.id_mecanico` | Cada reparación corresponde a un vehículo y un mecánico |
+| `piezas_reparacion` | `id_pieza` (entero autogenerado) | `id_reparacion → reparaciones.id_reparacion` | Cada pieza registrada corresponde a una reparación |
+
+**Esquema conceptual:** `Cliente 1—N Vehiculo 1—N Reparacion N—1 Mecanico`; `Reparacion 1—N PiezaReparacion`. Una FK reside en el extremo **N** de una relación 1:N.
+
+Explora también las restricciones: `NOT NULL`, `UNIQUE` para el correo, valores positivos de cantidad, tarifas no negativas, y estado de reparación limitado a `PENDIENTE`, `EN_PROCESO`, `FINALIZADA`. JPA **no sustituye** las reglas de integridad de la base de datos.
+
+**Comprueba:** ejecuta `SELECT * FROM clientes;` y luego un `JOIN`:
+
+```sql
+SELECT v.matricula, v.marca, c.nombre AS propietario
+FROM vehiculos v
+JOIN clientes c ON c.id_cliente = v.id_cliente;
+```
+
+**Preguntas:** ¿por qué la matrícula no usa `AUTOINCREMENT`? ¿Por qué no se puede insertar una reparación de un vehículo inexistente cuando SQLite comprueba las FK?
+
+## 3. Detecta el problema que resuelve un ORM
+
+Con JDBC, para recuperar un cliente debes preparar SQL, ejecutar la consulta, recorrer el `ResultSet` y copiar manualmente `id_cliente`, `nombre`, `email` y `telefono` a un `Cliente`. Para actualizarlo, debes escribir otra sentencia `UPDATE` y fijar cada parámetro. Esto hace que se repita el mapeo SQL ↔ Java.
+
+Con JPA, una clase anotada como entidad describe la correspondencia. Hibernate (implementación de JPA) genera el SQL necesario para operaciones habituales; **no elimina** la necesidad de saber SQL, de diseñar las tablas ni de gestionar transacciones.
+
+**Diferencia imprescindible:**
+
+- `modelo/Cliente.java`: objeto del dominio que utiliza el resto de la aplicación.
+- `orm/entity/ClienteEntity.java`: objeto que Hibernate conoce y asocia a `clientes`.
+- `orm/mapper/ClienteMapper.java`: traduce entre ambos, evitando que todo el código de negocio dependa de JPA.
+- `orm/repository/ClienteOrmRepository.java`: ofrece operaciones al código cliente y utiliza el `EntityManager`.
+
+## 4. Preparación de Maven y librerías
+
+Localiza el `pom.xml`. Estas son las dependencias que utiliza **esta solución**; puedes mantener las versiones ya incluidas en el proyecto (es importante que los dos módulos Hibernate tengan la misma versión).
+
+```xml
+<dependencies>
+  <!-- Implementación JPA / motor ORM -->
+  <dependency>
+    <groupId>org.hibernate.orm</groupId>
+    <artifactId>hibernate-core</artifactId>
+    <version>7.4.11.Final</version>
+  </dependency>
+
+  <!-- SQLite no es dialecto principal de Hibernate -->
+  <dependency>
+    <groupId>org.hibernate.orm</groupId>
+    <artifactId>hibernate-community-dialects</artifactId>
+    <version>7.4.11.Final</version>
+  </dependency>
+
+  <!-- Driver JDBC real para acceder al fichero .sqlite3 -->
+  <dependency>
+    <groupId>org.xerial</groupId>
+    <artifactId>sqlite-jdbc</artifactId>
+    <version>3.46.1.0</version>
+  </dependency>
+
+  <!-- Tests -->
+  <dependency>
+    <groupId>org.junit.jupiter</groupId>
+    <artifactId>junit-jupiter</artifactId>
+    <version>5.11.4</version>
+    <scope>test</scope>
+  </dependency>
+</dependencies>
+```
+
+En `properties` conserva `<maven.compiler.release>17</maven.compiler.release>` y en `build/plugins` los plugins `maven-compiler-plugin` y `maven-surefire-plugin` del proyecto. `jakarta.persistence.*` llega transitivamente con Hibernate; las anotaciones **son JPA**, mientras que Hibernate es su motor de ejecución.
+
+```bash
+java -version
+mvn -version
+mvn dependency:resolve
+mvn compile
+```
+
+**Comprueba:** Maven reconoce el proyecto y puede resolver las dependencias. Si falla antes de compilar, revisa el acceso a Maven Central, la versión de Java o si estás ejecutando el comando en la carpeta que contiene `pom.xml`.
+
+## 5. Configura la unidad de persistencia
+
+Crea `src/main/resources/META-INF/persistence.xml` (en el ZIP ya existe). Define una **unidad de persistencia**, es decir, el conjunto de entidades y propiedades que utilizará JPA:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence" version="3.1">
+  <persistence-unit name="tallerPU" transaction-type="RESOURCE_LOCAL">
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+    <class>es.ejemplo.taller.orm.entity.ClienteEntity</class>
+    <class>es.ejemplo.taller.orm.entity.VehiculoEntity</class>
+    <class>es.ejemplo.taller.orm.entity.MecanicoEntity</class>
+    <class>es.ejemplo.taller.orm.entity.ReparacionEntity</class>
+    <class>es.ejemplo.taller.orm.entity.PiezaReparacionEntity</class>
+    <properties>
+      <property name="jakarta.persistence.jdbc.driver" value="org.sqlite.JDBC"/>
+      <property name="hibernate.dialect" value="org.hibernate.community.dialect.SQLiteDialect"/>
+      <property name="hibernate.hbm2ddl.auto" value="none"/>
+      <property name="hibernate.show_sql" value="true"/>
+    </properties>
+  </persistence-unit>
+</persistence>
+```
+
+**Qué significa cada ajuste:** `tallerPU` es el nombre que utilizará Java; `RESOURCE_LOCAL` significa que la aplicación controla `begin/commit/rollback`; `provider` elige Hibernate; `class` registra las entidades; `driver` apunta a SQLite; `dialect` enseña a Hibernate las particularidades de SQL de SQLite; `hbm2ddl.auto=none` protege el esquema ya entregado; `show_sql=true` muestra las sentencias producidas (desactívalo cuando termines de estudiar).
+
+La **URL de conexión no se fija aquí**: se pasa desde Java para poder elegir la copia de la base o una base de pruebas. Si SQLite abre un archivo nuevo vacío por error, Hibernate encontrará tablas inexistentes. Usa una ruta correcta, por ejemplo `jdbc:sqlite:datos/taller-practicas.sqlite3` ejecutando desde la raíz del proyecto.
+
+## 6. Entiende EntityManagerFactory y EntityManager
+
+Crea `orm/config/OrmFactory.java`:
+
+```java
+package es.ejemplo.taller.orm.config;
+
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+import java.util.Map;
+
+public final class OrmFactory {
+    private OrmFactory() {}
+
+    public static EntityManagerFactory crear(String jdbcUrl) {
+        return Persistence.createEntityManagerFactory(
+            "tallerPU",
+            Map.of("jakarta.persistence.jdbc.url", jdbcUrl)
+        );
+    }
+}
+```
+
+**Diferencia esencial:** `EntityManagerFactory` es costosa y se suele crear **una vez** durante la vida de la aplicación; `EntityManager` es una sesión o contexto de persistencia de **vida corta**, que se crea para una operación o unidad de trabajo. No compartas el mismo `EntityManager` entre hilos.
+
+**Flujo de una operación:**
+
+```text
+Código cliente → Repositorio → EntityManagerFactory
+                                  └─ createEntityManager()
+                                        ├─ begin()  [si hay escritura]
+                                        ├─ persist / find / query / merge / remove
+                                        ├─ flush (cuando corresponda)
+                                        ├─ commit() / rollback()
+                                        └─ close()
+```
+
+Prueba de conexión (cuando hayas creado las entidades de las fases siguientes):
+
+```java
+try (var factory = OrmFactory.crear("jdbc:sqlite:datos/taller-practicas.sqlite3")) {
+    try (var em = factory.createEntityManager()) {
+        System.out.println(em.isOpen());
+    }
+}
+```
+
+**Comprueba:** `true` indica que el gestor está abierto; no demuestra todavía que todas las consultas funcionen. Cerrar el gestor y cerrar la fábrica son responsabilidades distintas.
+
+## 7. Entidad 1 — Cliente: de una tabla a una clase JPA
+
+Crea `orm/entity/ClienteEntity.java`:
+
+```java
+package es.ejemplo.taller.orm.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "clientes")
+public class ClienteEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_cliente")
+    private Integer idCliente;
+
+    @Column(name = "nombre", nullable = false)
+    private String nombre;
+
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
+    @Column(name = "telefono")
+    private String telefono;
+
+    protected ClienteEntity() {} // Necesario para JPA
+
+    public ClienteEntity(Integer idCliente, String nombre,
+                         String email, String telefono) {
+        this.idCliente = idCliente;
+        this.nombre = nombre;
+        this.email = email;
+        this.telefono = telefono;
+    }
+
+    // Genera getters y setters de los cuatro atributos con el IDE.
+}
+```
+
+**Anotación por anotación:** `@Entity` indica que la clase es persistente; `@Table` especifica el nombre real de la tabla; `@Id` elige el campo que identifica cada fila; `@GeneratedValue(IDENTITY)` delega el ID autoincremental a la base; `@Column` mapea nombre y restricciones. El constructor sin parámetros permite que Hibernate cree instancias cuando recupera filas. El identificador usa `Integer` porque inicialmente puede ser `null` antes de `persist`.
+
+**Actividad:** transforma `MecanicoEntity` del mismo modo; usa `id_mecanico`, `nombre`, `especialidad` y `tarifa_hora`. Para el dinero utiliza `BigDecimal`, no `double`, ya que hay problemas de precisión con los flotantes.
+
+**Comprueba:** ambas clases compilan. Explica por qué en Cliente el ID se genera automáticamente y en Vehículo no.
+
+## 8. Entidad 2 — Vehículo: clave primaria de texto y relación muchos-a-uno
+
+La PK de `vehiculos` es `matricula`, que **proporciona la aplicación**: no lleva `@GeneratedValue`. Además, `id_cliente` es una FK a `clientes`.
+
+En **esta solución de referencia** se utiliza una estrategia muy concreta: conservar el campo de FK `idCliente` como campo de escritura y añadir una asociación **solo de lectura de la FK**. Así se preservan los modelos existentes y los mappers solo necesitan números de ID.
+
+```java
+@Entity
+@Table(name = "vehiculos")
+public class VehiculoEntity {
+    @Id
+    @Column(name = "matricula")
+    private String matricula;
+
+    @Column(name = "marca")
+    private String marca;
+
+    @Column(name = "modelo")
+    private String modelo;
+
+    @Column(name = "anio")
+    private Integer anio;
+
+    @Column(name = "id_cliente")
+    private Integer idCliente;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_cliente", insertable = false, updatable = false)
+    private ClienteEntity cliente;
+
+    protected VehiculoEntity() {}
+    // Añade constructor, getters y setters como en el código entregado.
+}
+```
+
+**Lee la relación de izquierda a derecha:** muchos vehículos pertenecen a un cliente (`@ManyToOne`). `@JoinColumn(name="id_cliente")` señala **la FK de la tabla vehiculos**, no la PK de clientes. `LAZY` intenta cargar el cliente cuando haga falta. `insertable=false, updatable=false` es importante: impide que JPA intente escribir la misma columna `id_cliente` dos veces (una por el entero y otra por el objeto); **para cambiar el propietario en esta solución se cambia `idCliente`, no `cliente`**.
+
+**Opción alternativa, NO mezclarla con el ejemplo anterior:** puedes eliminar el entero `idCliente` y hacer que la asociación sea la fuente de escritura:
+
+```java
+@ManyToOne(fetch = FetchType.LAZY, optional = false)
+@JoinColumn(name = "id_cliente", nullable = false)
+private ClienteEntity cliente;
+```
+
+En ese diseño necesitas asignar la referencia `ClienteEntity` al crear un vehículo (por ejemplo con `em.getReference(ClienteEntity.class, idCliente)`) y adaptar los mappers. **Elige una estrategia y manténla en toda la solución**; en el ZIP se implementa la primera.
+
+**Comprueba:** ¿qué ocurre si la matrícula no existe al buscarla? ¿Qué columna cambia si reasignas un vehículo a otro cliente?
+
+## 9. Entidades 3, 4 y 5 — completa todas las relaciones
+
+### 9.1 `MecanicoEntity`
+
+`@Entity`, `@Table(name="mecanicos")`, PK `id_mecanico` con `@GeneratedValue(IDENTITY)` y atributos `nombre`, `especialidad` y `tarifaHora` (`@Column(name="tarifa_hora")`, tipo `BigDecimal`). No contiene ninguna FK.
+
+### 9.2 `ReparacionEntity`
+
+La tabla `reparaciones` contiene dos FK: `matricula` y `id_mecanico`. Cada fila relaciona **un vehículo** y **un mecánico**. Sus campos son `idReparacion`, `matricula`, `idMecanico`, `descripcion`, `fecha`, `horasTrabajo` y `estado`; en la solución existente `fecha` y `estado` son `String` (no inventes tipos distintos al hacer los mappers).
+
+Añade ambas asociaciones siguiendo el patrón de FK escribible + asociación de lectura:
+
+```java
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "matricula", insertable = false, updatable = false)
+private VehiculoEntity vehiculo;
+
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "id_mecanico", insertable = false, updatable = false)
+private MecanicoEntity mecanico;
+```
+
+**Por qué son dos `@ManyToOne`:** la reparación tiene un solo vehículo y un solo mecánico, pero cada uno puede aparecer en numerosas reparaciones. No estás estableciendo una relación directa muchos-a-muchos entre vehículos y mecánicos: `reparaciones` tiene datos propios (`descripcion`, `fecha`, `horas_trabajo`, `estado`) y es una entidad por sí misma.
+
+### 9.3 `PiezaReparacionEntity`
+
+PK `id_pieza`; FK `id_reparacion`; demás columnas `nombre`, `cantidad`, `precio_unitario` (este último es `BigDecimal`). Añade:
+
+```java
+@Column(name = "id_reparacion")
+private Integer idReparacion;
+
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "id_reparacion", insertable = false, updatable = false)
+private ReparacionEntity reparacion;
+```
+
+**Ejercicio de extensión opcional:** añade en `ClienteEntity` una lista `@OneToMany(mappedBy="cliente")` de vehículos. `mappedBy` apunta al **atributo de asociación** que existe en `VehiculoEntity`, no al nombre SQL. No añadas `CascadeType.REMOVE` sin analizar el `ON DELETE RESTRICT` del esquema. Las colecciones bidireccionales requieren cuidar la sincronización entre ambos lados y la carga diferida.
+
+**Cuestión clave:** `@ManyToOne` no genera una nueva columna si la FK `@JoinColumn` apunta a una existente. `@OneToMany` describe la navegación inversa, que no es obligatoria para guardar o consultar los datos.
+
+## 10. Aprende el ciclo de vida de una entidad
+
+| Estado | Significado | Ejemplo |
+|---|---|---|
+| **Transient / nueva** | Es un objeto Java aún no gestionado | `new ClienteEntity(...)` |
+| **Managed / administrada** | Está dentro del contexto de persistencia | Después de `em.find()` o `em.persist()` |
+| **Detached / separada** | Era administrada, pero el `EntityManager` ya está cerrado | Una entidad devuelta tras `em.close()` |
+| **Removed / eliminada** | Marcada para borrarse al sincronizar cambios | Después de `em.remove(entidadGestionada)` |
+
+`persist` registra una nueva entidad; `find` busca por PK; `merge` copia el estado de una entidad separada a una instancia administrada **y devuelve esa instancia**; `remove` elimina una instancia administrada. `flush` envía operaciones pendientes a la base pero **no confirma** la transacción; `commit` confirma. El ORM puede enviar SQL antes de `commit` cuando sea necesario.
+
+**Error típico:** hacer `em.remove(new ClienteEntity(...))` o intentar acceder a una asociación `LAZY` después de cerrar el `EntityManager`. Para borrar primero recupera la entidad administrada; para leer relaciones usa un `JOIN FETCH` dentro del gestor abierto, o convierte lo necesario a un DTO antes de cerrarlo.
+
+## 11. Construye los mappers dominio ↔ JPA
+
+¿Por qué no devolver directamente `ClienteEntity` desde el repositorio? Porque el resto de la aplicación ya trabaja con `modelo.Cliente`; además, así se evita exponer estados administrados y detalles de Hibernate a la capa de dominio.
+
+Crea `orm/mapper/ClienteMapper.java`. Adapta el constructor de `Cliente` a la firma que figure en `modelo/Cliente.java`:
+
+```java
+package es.ejemplo.taller.orm.mapper;
+
+import es.ejemplo.taller.modelo.Cliente;
+import es.ejemplo.taller.orm.entity.ClienteEntity;
+
+public final class ClienteMapper {
+    private ClienteMapper() {}
+
+    public static ClienteEntity toEntity(Cliente cliente) {
+        return new ClienteEntity(cliente.getIdCliente(), cliente.getNombre(),
+            cliente.getEmail(), cliente.getTelefono());
+    }
+
+    public static Cliente toDomain(ClienteEntity entidad) {
+        return new Cliente(entidad.getIdCliente(), entidad.getNombre(),
+            entidad.getEmail(), entidad.getTelefono());
+    }
+}
+```
+
+En `VehiculoMapper`, lee y escribe `idCliente`, no `cliente.getNombre()`: así evitas inicializar relaciones `LAZY` cuando solo quieres un modelo de dominio plano. En `ReparacionMapper`, conserva las FK `matricula` e `idMecanico`; y en `PiezaReparacionMapper`, `idReparacion`. El mapper de Mecánico debe copiar `BigDecimal tarifaHora` sin redondeos innecesarios.
+
+**Comprueba:** crea un objeto de dominio en memoria, conviértelo a entidad y de vuelta, y verifica que los valores son iguales. Aún no necesitas base de datos para esta prueba.
+
+## 12. Define el contrato genérico de repositorio
+
+Crea `orm/repository/IRepository.java`:
+
+```java
+package es.ejemplo.taller.orm.repository;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface IRepository<T, ID> {
+    List<T> findAll();
+    Optional<T> findById(ID id);
+    void create(T entity);
+    boolean update(T entity);
+    boolean delete(ID id);
+}
+```
+
+`T` es el **tipo de dominio** que ve la aplicación; `ID` es la PK (`Integer` en clientes, mecánicos, reparaciones y piezas; `String` para la matrícula). `Optional` expresa que un registro podría no existir. `update` y `delete` devuelven `false` si el ID no se encuentra. Un contrato estable permite intercambiar JDBC por ORM sin reescribir el código que invoca esos métodos.
+
+## 13. Implementa el CRUD con EntityManager, primero sin generalizar
+
+Construye primero los métodos de `ClienteOrmRepository` a mano. Cuando comprendas cómo funcionan, podrás extraer la repetición a `AbstractOrmRepository`.
+
+### 13.1 CREATE: `persist()` y transacción
+
+```java
+public void crearCliente(Cliente cliente) {
+    try (var em = factory.createEntityManager()) {
+        var tx = em.getTransaction();
+        try {
+            tx.begin();
+            ClienteEntity entidad = ClienteMapper.toEntity(cliente);
+            em.persist(entidad);
+            em.flush(); // Necesario aquí para leer inmediatamente el ID generado
+            cliente.setIdCliente(entidad.getIdCliente());
+            tx.commit();
+        } catch (RuntimeException ex) {
+            if (tx.isActive()) tx.rollback();
+            throw ex;
+        }
+    }
+}
+```
+
+**Explicación línea a línea:** (1) se crea un contexto, (2) se obtiene la transacción, (3) `begin` abre la unidad de trabajo, (4) el mapper construye la entidad, (5) `persist` la registra, (6) `flush` sincroniza el INSERT para disponer del ID generado, (7) lo copiamos al objeto de dominio, (8) `commit` confirma, (9) si hay excepción se revierte con `rollback`, y (10) el try-with-resources cierra el `EntityManager`. Si el `commit` falla, la escritura no debe considerarse exitosa.
+
+### 13.2 READ por ID: `find()`
+
+```java
+public Optional<Cliente> buscarCliente(int id) {
+    try (var em = factory.createEntityManager()) {
+        return Optional.ofNullable(em.find(ClienteEntity.class, id))
+                       .map(ClienteMapper::toDomain);
+    }
+}
+```
+
+`find` consulta **por la clave primaria**, no por cualquier atributo. Devuelve `null` si no encuentra la fila. Al convertir dentro del `EntityManager` abierto, no dependemos de una sesión posterior.
+
+### 13.3 READ todos: JPQL
+
+```java
+public List<Cliente> listarClientes() {
+    try (var em = factory.createEntityManager()) {
+        return em.createQuery(
+                "select c from ClienteEntity c order by c.nombre",
+                ClienteEntity.class)
+            .getResultStream()
+            .map(ClienteMapper::toDomain)
+            .toList();
+    }
+}
+```
+
+**JPQL no es SQL:** escribe el **nombre de la clase** `ClienteEntity` y sus **atributos Java** (`nombre`), no `clientes` ni `id_cliente`. Hibernate traduce la expresión a SQL para SQLite.
+
+### 13.4 UPDATE: `find()` + cambios administrados
+
+```java
+public boolean actualizarEmail(int id, String nuevoEmail) {
+    try (var em = factory.createEntityManager()) {
+        var tx = em.getTransaction();
+        try {
+            tx.begin();
+            ClienteEntity c = em.find(ClienteEntity.class, id);
+            if (c == null) {
+                tx.commit();
+                return false;
+            }
+            c.setEmail(nuevoEmail); // dirty checking
+            tx.commit();           // Hibernate detecta el cambio
+            return true;
+        } catch (RuntimeException ex) {
+            if (tx.isActive()) tx.rollback();
+            throw ex;
+        }
+    }
+}
+```
+
+No necesitamos llamar a `merge` aquí porque `c` **ya es administrada**. En cambio, para actualizar un objeto de dominio convertido a nueva `ClienteEntity`, el repositorio genérico usa `em.merge(...)`, tras comprobar que la fila existe.
+
+### 13.5 DELETE: `remove()`
+
+```java
+public boolean borrarCliente(int id) {
+    try (var em = factory.createEntityManager()) {
+        var tx = em.getTransaction();
+        try {
+            tx.begin();
+            ClienteEntity c = em.find(ClienteEntity.class, id);
+            if (c == null) {
+                tx.commit();
+                return false;
+            }
+            em.remove(c);
+            tx.commit();
+            return true;
+        } catch (RuntimeException ex) {
+            if (tx.isActive()) tx.rollback();
+            throw ex;
+        }
+    }
+}
+```
+
+**Atención:** si existen vehículos asociados al cliente y las FK se hacen cumplir, la base puede rechazar el borrado por `ON DELETE RESTRICT`. Esto es comportamiento esperado, no un fallo del ORM. Si una escritura falla, observa el mensaje SQL y comprueba el `rollback`.
+
+**Comprobación del paso:** crea un cliente, recupera el ID, consulta, modifica el correo, vuelve a consultar y borra **solo** un cliente recién creado que no tenga vehículos.
+
+## 14. Refactoriza el código repetido a AbstractOrmRepository
+
+Observa lo que se repite en los cinco repositorios: abrir y cerrar un gestor, abrir/cerrar transacciones, `find`, `persist`, `merge`, `remove` y manejar fallos. Crea `AbstractOrmRepository<T,E,ID>`:
+
+- `T`: tipo de dominio (`Cliente`).
+- `E`: entidad (`ClienteEntity`).
+- `ID`: tipo de PK (`Integer`).
+- `Function<T,E> toEntity`: conversión a persistencia.
+- `Function<E,T> toDomain`: conversión a dominio.
+- `Function<T,ID> domainId`: extracción del ID.
+- `BiConsumer<T,E> onPersist`: copia del ID generado al modelo.
+
+La clase completa está en `orm/repository/AbstractOrmRepository.java` del proyecto. **No empieces por copiarla**: primero identifica qué líneas se repiten en el CRUD anterior. A continuación examina su método de escritura, que es la pieza central:
+
+```java
+protected <R> R write(Function<EntityManager, R> action) {
+    try (EntityManager em = factory.createEntityManager()) {
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            R result = action.apply(em);
+            tx.commit();
+            return result;
+        } catch (RuntimeException ex) {
+            if (tx.isActive()) tx.rollback();
+            throw ex;
+        }
+    } catch (RuntimeException ex) {
+        throw new RepositoryException("Error de escritura ORM", ex);
+    }
+}
+```
+
+`action.apply(em)` permite pasar diferentes operaciones sin volver a copiar la gestión de transacciones. `read(...)` abre y cierra el gestor pero no abre una transacción de escritura. En la implementación entregada, el `create` genérico utiliza `persist` + `flush` y sincroniza el ID; `update` verifica primero si existe y después llama a `merge`; `delete` usa `find` + `remove`.
+
+Un repositorio concreto queda muy pequeño:
+
+```java
+public final class ClienteOrmRepository
+    extends AbstractOrmRepository<Cliente, ClienteEntity, Integer> {
+
+    public ClienteOrmRepository(EntityManagerFactory factory) {
+        super(factory, ClienteEntity.class,
+              ClienteMapper::toEntity,
+              ClienteMapper::toDomain,
+              Cliente::getIdCliente,
+              (dominio, entidad) -> dominio.setIdCliente(entidad.getIdCliente()));
+    }
+}
+```
+
+**Comprueba:** ¿por qué los vehículos usan `String` en `ID`? ¿Por qué para Vehículo `onPersist` no tiene que copiar ninguna PK generada? ¿Qué ocurre con una operación fallida dentro de `write`?
+
+## 15. Construye los cinco repositorios específicos
+
+Cada repositorio hereda CRUD y añade consultas del dominio:
+
+| Clase | Métodos específicos que debes implementar |
+|---|---|
+| `ClienteOrmRepository` | CRUD genérico (sin específicos adicionales en la referencia) |
+| `VehiculoOrmRepository` | `buscarPorCliente(Integer)`, `listarPorMarca(String)` |
+| `MecanicoOrmRepository` | `buscarPorEspecialidad(String)` |
+| `ReparacionOrmRepository` | `buscarPorVehiculo(String)`, `buscarPorMecanico(Integer)`, `listarPendientes()` |
+| `PiezaReparacionOrmRepository` | `listarPorReparacion(Integer)`, `calcularCostePiezas(Integer)` |
+
+**Orden recomendado:** completa Cliente → Mecánico → Vehículo → Reparación → Pieza. Este orden sigue las dependencias entre tablas y facilita crear datos de prueba válidos.
+
+## 16. Aprende a escribir consultas específicas JPQL
+
+### 16.1 Filtros por atributos
+
+Ejemplo: vehículos de un cliente (`VehiculoOrmRepository`):
+
+```java
+public List<Vehiculo> buscarPorCliente(Integer idCliente) {
+    return read(em -> em.createQuery(
+            "select v from VehiculoEntity v where v.idCliente = :id",
+            VehiculoEntity.class)
+        .setParameter("id", idCliente)
+        .getResultStream()
+        .map(VehiculoMapper::toDomain)
+        .toList());
+}
+```
+
+**Desmenuzado:** `select v` selecciona objetos; `VehiculoEntity` es la entidad, `v` su alias; `where v.idCliente = :id` filtra usando el atributo Java; `:id` es un parámetro con nombre; `setParameter` lo fija sin concatenar entradas de usuario; `getResultStream()` obtiene resultados; `map` los convierte al modelo.
+
+Repite el patrón:
+
+```java
+// Vehículos por marca
+"select v from VehiculoEntity v where v.marca = :marca"
+
+// Mecánicos por especialidad
+"select m from MecanicoEntity m where m.especialidad = :valor"
+
+// Reparaciones de un vehículo
+"select r from ReparacionEntity r where r.matricula = :valor"
+
+// Reparaciones de un mecánico
+"select r from ReparacionEntity r where r.idMecanico = :valor"
+
+// Reparaciones pendientes
+"select r from ReparacionEntity r where r.estado = 'PENDIENTE'"
+```
+
+**Comprueba:** ¿qué cambia si el parámetro contiene una comilla simple? Al usar `setParameter`, no se convierte en parte del código de la consulta.
+
+### 16.2 Navegar relaciones mediante objetos
+
+Una ventaja del mapeo ORM es poder usar rutas entre asociaciones:
+
+```java
+// Se navega de vehículo → cliente
+"select v from VehiculoEntity v where v.cliente.email = :email"
+
+// Se navega de reparación → vehículo → cliente
+"select r from ReparacionEntity r where r.vehiculo.cliente.idCliente = :id"
+```
+
+**Importante:** estas consultas usan atributos de entidad, no nombres de tabla. Hibernate traduce la navegación a las uniones necesarias; para filtrar por la FK simple `v.idCliente`, no necesitas recorrer `v.cliente`.
+
+### 16.3 JOIN y JOIN FETCH (diferencia)
+
+```java
+// JOIN para filtrar reparaciones por especialidad del mecánico
+"select r from ReparacionEntity r " +
+"join r.mecanico m where m.especialidad = :esp"
+
+// JOIN FETCH para cargar el vehículo en el mismo contexto
+"select r from ReparacionEntity r join fetch r.vehiculo " +
+"where r.idReparacion = :id"
+```
+
+Un `JOIN` permite combinar entidades para filtrar. Un `JOIN FETCH` solicita además la carga inmediata de la asociación indicada (útil antes de cerrar el gestor). Cuidado al utilizar varios `JOIN FETCH` de colecciones: puede multiplicar filas y ser ineficiente. En este taller las asociaciones mostradas son principalmente `ManyToOne`.
+
+### 16.4 Ordenación, paginación y conteo
+
+```java
+// Ordenación
+"select r from ReparacionEntity r order by r.fecha desc"
+
+// Conteo de reparaciones por estado
+Long total = em.createQuery(
+        "select count(r) from ReparacionEntity r where r.estado = :estado",
+        Long.class)
+    .setParameter("estado", "PENDIENTE")
+    .getSingleResult();
+
+// Paginación
+var pagina = em.createQuery(
+        "select r from ReparacionEntity r order by r.idReparacion",
+        ReparacionEntity.class)
+    .setFirstResult(0)
+    .setMaxResults(10)
+    .getResultList();
+```
+
+`getSingleResult` es apropiado para `count`, que siempre produce una fila agregada. Para búsquedas de un único registro que puede faltar, es más cómodo `getResultStream().findFirst()` o `getResultList()`.
+
+### 16.5 Agregaciones y coste de piezas
+
+En el proyecto de referencia `calcularCostePiezas` recupera las piezas y suma en Java `precioUnitario × cantidad` usando `BigDecimal`:
+
+```java
+public BigDecimal calcularCostePiezas(Integer idReparacion) {
+    return listarPorReparacion(idReparacion).stream()
+        .map(p -> p.getPrecioUnitario()
+            .multiply(BigDecimal.valueOf(p.getCantidad())))
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+}
+```
+
+**Ampliación:** propón una consulta JPQL con `sum(p.precioUnitario * p.cantidad)` y `coalesce` para devolver cero cuando no haya piezas. **Advertencia:** verifica el tipo numérico de la suma con el proveedor y el dialecto (SQLite/Hibernate) antes de convertirla a `BigDecimal`; para la solución base usa la suma en Java, más fácil de razonar.
+
+**Actividad:** crea `buscarReparacionesPorEstado(String estado)` mediante un parámetro `:estado`, en lugar de incluir el literal `PENDIENTE`. Valida que el estado pertenezca al conjunto permitido.
+
+## 17. Trabaja correctamente con relaciones y transacciones
+
+**Caso práctico — registrar una reparación con piezas:** primero debe existir el `Vehiculo` y el `Mecanico`, luego se crea una reparación y finalmente las piezas con su `idReparacion`. Si necesitas que todas esas operaciones sean atómicas, **no llames por separado a varios `create()` que abren su propia transacción**. Crea un **servicio** que abra un solo `EntityManager`, inicie una transacción y registre todos los cambios antes de un único `commit`.
+
+```java
+try (var em = factory.createEntityManager()) {
+    var tx = em.getTransaction();
+    try {
+        tx.begin();
+        // Obtener referencias existentes (no crear vehículos/mecánicos ficticios).
+        // persist(reparacion); flush(); persist(pieza1); persist(pieza2);
+        // Usar las entidades y FK según la estrategia de mapeo adoptada.
+        tx.commit();
+    } catch (RuntimeException ex) {
+        if (tx.isActive()) tx.rollback();
+        throw ex;
+    }
+}
+```
+
+Este bloque es un **esqueleto didáctico**, no una operación lista para copiar: el alumnado debe implementar la creación y el enlace de entidades respetando la estrategia de FK elegida. Al usar `@JoinColumn(insertable=false, updatable=false)`, fija los atributos FK (`matricula`, `idMecanico`, `idReparacion`) que realmente se escriben.
+
+**Comprobación:** provoca un fallo al insertar una pieza con cantidad `0` y verifica que **no se ha guardado ninguna parte** de la transacción. Para que SQLite valide referencias externas también en las conexiones que abre Hibernate, comprueba el estado de `PRAGMA foreign_keys` para esa conexión; no supongas que ejecutar el `PRAGMA` una sola vez sobre otra conexión lo activa globalmente.
+
+## 18. Ejecuta una demostración de lectura
+
+El proyecto incluye `orm/DemoOrm.java`. Antes de ejecutarlo, revisa la URL JDBC que emplea y confirma que abre tu copia de SQLite. Un ejemplo alternativo de uso es:
+
+```java
+try (var factory = OrmFactory.crear("jdbc:sqlite:datos/taller-practicas.sqlite3")) {
+    var clientes = new ClienteOrmRepository(factory);
+    var vehiculos = new VehiculoOrmRepository(factory);
+
+    clientes.findAll().forEach(c -> System.out.println(c.getNombre()));
+    vehiculos.buscarPorCliente(1)
+             .forEach(v -> System.out.println(v.getMatricula()));
+}
+```
+
+Añade los imports necesarios de `OrmFactory` y los repositorios. En la primera ejecución limita la demo a lecturas; así podrás comparar el resultado ORM con consultas SQL directas y comprobar que no se han modificado datos.
+
+## 19. Escribe pruebas automáticas del ORM
+
+Los tests que venían con el proyecto prueban principalmente los **DAO JDBC** y **no sustituyen** a las pruebas de la nueva capa ORM. Añade tests propios, sobre una **copia aislada** de la base de pruebas para no alterar datos compartidos.
+
+Casos mínimos que hay que comprobar:
+
+1. `findAll` recupera filas existentes y `findById` devuelve `Optional.empty()` cuando no existe el ID.
+2. `create` persiste un cliente y copia su PK autogenerada al modelo de dominio.
+3. `update` cambia un dato y retorna `false` para un ID inexistente.
+4. `delete` borra un registro sin dependencias y retorna `false` para un ID inexistente.
+5. `buscarPorCliente` devuelve únicamente vehículos de ese cliente.
+6. `buscarPorMecanico`, `buscarPorVehiculo` y `listarPendientes` aplican sus filtros.
+7. `calcularCostePiezas` suma correctamente cantidades y precios y retorna cero si no hay piezas.
+8. Se produce un `rollback` completo al fallar una escritura múltiple.
+
+Esqueleto ilustrativo de JUnit 5:
+
+```java
+@Test
+void buscarClienteInexistenteDevuelveEmpty() {
+    try (var factory = OrmFactory.crear(urlBaseTemporal)) {
+        var repo = new ClienteOrmRepository(factory);
+        assertTrue(repo.findById(-123456).isEmpty());
+    }
+}
+```
+
+El valor `urlBaseTemporal` debe configurarse en el test, por ejemplo copiando la SQLite de pruebas a un archivo temporal. Importa `@Test`, `assertTrue` y las clases del proyecto. No ejecutes escrituras sobre la SQLite de producción.
 
 ```bash
 mvn clean test
 ```
 
-## 3. Material del proyecto
+**Criterio de evaluación:** distingue errores de **compilación** (clases, imports, tipos) de fallos de **ejecución** (base inexistente, tabla que falta, restricción FK, transacción, dialecto). Que `mvn compile` termine correctamente **no** prueba que Hibernate pueda leer o escribir la base.
 
-| Elemento | Contenido y finalidad |
-| --- | --- |
-| `pom.xml` | Configuración de compilación y dependencias |
-| `src/main/java/es/ejemplo/taller/modelo/` | Cinco clases modelo con constructores y métodos de acceso |
-| `src/main/java/es/ejemplo/taller/dao/` | Cinco DAO independientes con métodos pendientes |
-| `src/main/resources/schema.sql` | Creación de tablas y restricciones |
-| `src/test/java/es/ejemplo/taller/` | Preparación de las pruebas y pruebas de los DAO |
-| `src/test/resources/taller-test.sqlite3` | Plantilla vacía que se copia para cada prueba |
-| `datos/taller.sqlite3` | Base de datos con ejemplos para explorar y consultar |
-| `datos/taller-test.sqlite3` | Copia del esquema vacío para trabajo auxiliar |
-| `diagrama-taller.png` | Diagrama de la base de datos |
+## 20. Errores habituales y cómo diagnosticarlos
 
-La base de ejemplo contiene 6 clientes, 8 vehículos, 4 mecánicos, 10 reparaciones y 12 piezas. No debes utilizar esos recuentos como condición para validar cualquier base de datos: pertenecen únicamente a los datos de ejemplo de esta entrega.
+| Síntoma | Causa probable | Qué revisar |
+|---|---|---|
+| `no such table: clientes` | Ruta JDBC apunta a una SQLite nueva/vacía | Directorio de trabajo y archivo en `datos/` |
+| `Unknown entity` / entidad no gestionada | Falta `@Entity` o el registro en `persistence.xml` | Paquete, nombre completo, unidad `tallerPU` |
+| `Not an entity` en JPQL | Has escrito nombre SQL en vez de entidad | `ClienteEntity` en vez de `clientes` |
+| Error de columna duplicada | Se escribe FK tanto como entero como objeto | `insertable=false, updatable=false` en la asociación de lectura |
+| `LazyInitializationException` | Se accede a relación diferida tras cerrar el contexto | `JOIN FETCH` o transformación a DTO dentro del gestor |
+| Error `UNIQUE constraint failed` | Correo repetido | Validar email, gestionar excepción y rollback |
+| Error de FK / borrado rechazado | Registro referenciado o FK inexistente | Orden de inserciones, esquema, `ON DELETE RESTRICT` |
+| Un cambio no se guarda | Falta transacción o `commit` | `begin`, `commit`, `rollback`; estado administrado |
+| Cambio a `cliente` no se persiste | Asociación de solo lectura | Actualizar `idCliente` en esta variante de diseño |
+| La consulta encuentra cero filas | Parámetro, mayúsculas, datos o ruta incorrectos | `setParameter`, DB usada, SQL generado |
 
-`target/` es una carpeta generada por Maven. Sus compilados e informes no son código fuente y no deben incluirse en la entrega final.
+## 21. Actividad final: construye un caso de uso completo
 
-## 4. Modelo de datos
+**Enunciado:** añade un cliente, registra uno de sus vehículos, asigna al vehículo una reparación realizada por un mecánico existente, agrega dos piezas y muestra un informe que incluya matrícula, nombre del cliente, mecánico, descripción, estado y coste total de piezas.
 
-![Diagrama de la base de datos del taller mecánico](diagrama-taller.png)
+**Secuencia de trabajo:** define qué se crea y qué debe existir antes; diseña el servicio y su transacción; implementa las consultas; crea pruebas de éxito y de rollback; finalmente explica por qué el código cliente no necesita escribir SQL.
 
-| Tabla | Clave primaria | Relaciones y restricciones principales |
-| --- | --- | --- |
-| `clientes` | `id_cliente`, entero autogenerado | Nombre y correo obligatorios; correo único |
-| `vehiculos` | `matricula`, texto | Cliente asociado; marca, modelo y año obligatorios |
-| `mecanicos` | `id_mecanico`, entero autogenerado | Nombre y especialidad obligatorios; tarifa no negativa |
-| `reparaciones` | `id_reparacion`, entero autogenerado | Vehículo y mecánico asociados; horas no negativas; estado limitado |
-| `piezas_reparacion` | `id_pieza`, entero autogenerado | Reparación asociada; cantidad positiva; precio no negativo |
+**Ampliaciones:** consulta reparaciones por email del cliente, paginación por fecha, coste de mano de obra (`horasTrabajo × tarifaHora`) y suma total de la reparación. Redacta en cada caso la versión SQL equivalente a tu JPQL y comprueba que ambas dan resultados coherentes.
 
-> **Autogenerado**, quiere decir que durante la inserción genera el id la bbdd (PRIMARY KEY AUTOINCREMENT). Debes de tenerlo en cuenta a la hora de realizar las operaciones sobre la bbdd.
+## 22. Lista de comprobación para entregar
 
-Relaciones:
+- [ ] Identifico PK, FK y restricciones de las cinco tablas.
+- [ ] Entiendo el CRUD existente con JDBC y qué mapeo repite.
+- [ ] `pom.xml` compila con las bibliotecas ORM y SQLite.
+- [ ] `persistence.xml` registra las cinco entidades.
+- [ ] Distingo la `EntityManagerFactory` del `EntityManager`.
+- [ ] He creado cinco entidades con los nombres reales de tablas y columnas.
+- [ ] Las cuatro FK están correctamente representadas como asociaciones `@ManyToOne`.
+- [ ] Comprendo por qué las asociaciones son de solo lectura en esta implementación.
+- [ ] He escrito y probado los cinco mappers.
+- [ ] He implementado el CRUD con transacciones y `rollback`.
+- [ ] Comprendo `persist`, `find`, `merge`, `remove`, `flush` y los estados de entidad.
+- [ ] He implementado los cinco repositorios y todas sus consultas específicas.
+- [ ] Sé explicar `JOIN`, `JOIN FETCH`, `setParameter` y `getResultStream`.
+- [ ] He probado la solución con una base de datos aislada.
+- [ ] Puedo explicar qué código ha dejado de ser necesario respecto a JDBC.
 
-- Un cliente puede tener varios vehículos.
-- Un vehículo puede tener varias reparaciones.
-- Un mecánico puede realizar varias reparaciones.
-- Una reparación puede incluir varias piezas.
+## 23. Entrega recomendada
 
-Los estados admitidos son `PENDIENTE`, `EN_PROCESO` y `FINALIZADA`. El esquema declara `ON DELETE RESTRICT` en las relaciones: su aplicación requiere que esté activada la comprobación de **claves foráneas en la conexión**.
+Entrega el proyecto Maven, la guía completada con respuestas a las preguntas y una captura o salida de `mvn clean test`. Incluye una breve comparación de **una** operación JDBC y su equivalente JPA: SQL escrito manualmente, copia de columnas, control de transacciones, código del repositorio y resultado obtenido. Si alguna prueba no pasa, explica cuál es la causa y qué has comprobado.
 
-### Tipos de datos y reglas
+---
 
-El diagrama expresa tipos conceptuales como `VARCHAR`, `DATE` y `DECIMAL`. El esquema SQLite entregado utiliza principalmente `TEXT`, `INTEGER` y `NUMERIC`. Consulta `schema.sql` para conocer las restricciones que realmente están declaradas; las longitudes y escalas dibujadas no constituyen validaciones adicionales en ese archivo.
+**Nota para el profesorado:** el ZIP de referencia contiene la solución ORM, los DAO JDBC y los tests JDBC originales. La guía enseña a reproducir la capa ORM existente, cuya estrategia conserva las FK escalares como fuente de escritura; las consultas avanzadas y la transacción de caso de uso son propuestas de ampliación y requieren implementación. La ejecución real de tests Hibernate depende de un entorno Maven disponible y debe verificarse antes de utilizarla como criterio de corrección.
 
-- En los modelos, los identificadores autogenerados se representan mediante `Integer`; la matrícula es `String`.
-- Las fechas se manejan como `String`: utiliza el formato `AAAA-MM-DD`. El esquema no valida por sí solo que el texto sea una fecha real; valida el formato y la fecha en el código Java.
-- Los importes y las horas se representan con `BigDecimal`. Evita introducir cálculos intermedios con `double`; construye valores decimales a partir de texto cuando proceda.
-- `NOT NULL` impide almacenar `NULL`, pero no impide automáticamente guardar `""` o espacios.
-- El teléfono del cliente admite `null`.
-- Considera inválidos los textos obligatorios vacíos o compuestos solo por espacios. Esta regla debe implementarse expresamente; no está cubierta completamente por las pruebas originales.
 
-## 5. Primera fase: conocer la base de datos con SQL
+---
 
-Antes de programar los DAO, explora `datos/taller.sqlite3` y guarda tus consultas en `consultas.sql`. Añade comentarios que expliquen qué obtiene cada consulta. Realiza cualquier experimento que modifique datos sobre una copia de la base de ejemplo.
+# ANEXO DOCENTE — Laboratorio explicado línea a línea
 
-Resuelve estas **10 actividades**:
+> Este anexo amplía las fases anteriores. Se recomienda **seguirlo con el editor abierto**, crear las clases en el orden indicado, ejecutar cada comprobación y anotar el resultado. Las variantes marcadas como «ampliación» no sustituyen al diseño original hasta que se modifiquen también los mappers y los repositorios.
 
-1. Lista los clientes ordenados por nombre.
-2. Consulta matrícula, marca, modelo y año de los vehículos de una marca elegida.
-3. Obtén los vehículos de un cliente utilizando su identificador.
-4. Lista los mecánicos de una especialidad y ordénalos por tarifa.
-5. Obtén las reparaciones pendientes, ordenadas por fecha.
-6. Muestra la matrícula de cada vehículo y el nombre de su propietario. Resuélvelo una vez con `WHERE` y otra con `INNER JOIN`.
-7. Muestra las reparaciones con el nombre del cliente, la matrícula y el nombre del mecánico.
-8. Cuenta los vehículos de cada cliente, incluyendo clientes sin vehículos.
-9. Calcula el coste de piezas por reparación, incluyendo las reparaciones sin piezas con coste cero.
-10. Obtén las reparaciones que no tienen piezas asociadas.
+## A. Inspección real del proyecto antes de tocar JPA
 
-Si los datos de ejemplo no permiten observar un caso, prepara datos adicionales en una copia. Explica la diferencia entre `INNER JOIN` y `LEFT JOIN`, y para qué sirven `GROUP BY`, `SUM` y `COALESCE`.
+### A.1. Las cinco tablas y sus identificadores
 
-### Pista: relacionar tablas y proteger sus relaciones son cosas distintas
+| Tabla SQLite | Entidad Java | Identificador Java | Tipo | Claves que enlazan tablas |
+|---|---|---|---|---|
+| `clientes` | `ClienteEntity` | `idCliente` | `Integer` | — |
+| `vehiculos` | `VehiculoEntity` | `matricula` | `String` | `id_cliente` → clientes |
+| `mecanicos` | `MecanicoEntity` | `idMecanico` | `Integer` | — |
+| `reparaciones` | `ReparacionEntity` | `idReparacion` | `Integer` | `matricula` → vehículos; `id_mecanico` → mecánicos |
+| `piezas_reparacion` | `PiezaReparacionEntity` | `idPieza` | `Integer` | `id_reparacion` → reparaciones |
 
-Puedes relacionar tablas mediante `JOIN ... ON` o mediante una condición en `WHERE` aunque la comprobación de claves foráneas esté desactivada. La relación de la consulta depende de la condición que escribes.
+**Paso A1.** Abre `datos/taller.sqlite3` con un visor SQLite. Ejecuta:
 
 ```sql
--- Relación mediante WHERE
-SELECT v.matricula, c.nombre
-FROM vehiculos v, clientes c
-WHERE v.id_cliente = c.id_cliente;
+SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name;
+PRAGMA table_info(vehiculos);
+PRAGMA foreign_key_list(vehiculos);
+PRAGMA table_info(reparaciones);
+PRAGMA foreign_key_list(reparaciones);
 ```
 
-```sql
--- Relación mediante INNER JOIN
-SELECT v.matricula, c.nombre
-FROM vehiculos v
-INNER JOIN clientes c ON v.id_cliente = c.id_cliente;
+**Paso A2.** Dibuja las cardinalidades: un cliente puede tener varios vehículos; un vehículo puede tener varias reparaciones; un mecánico puede realizar varias reparaciones; una reparación puede contener varias piezas. **La clave foránea está siempre en el lado «muchos»** de estos ejemplos.
+
+**Paso A3.** Localiza las clases `modelo/` y comprueba que son objetos de dominio, no entidades JPA. Deben poder emplearse aunque cambie el motor de persistencia. Escribe en el cuaderno qué campos de dominio corresponden a cada columna.
+
+**Comprobación:** ¿puede haber dos reparaciones para una misma matrícula? Sí. ¿Puede haber dos vehículos con la misma matrícula? No, porque es clave primaria.
+
+## B. Maven: cada dependencia, por qué y dónde actúa
+
+En el `pom.xml` de esta solución se utiliza Java 17 como versión de compilación, Hibernate ORM y el dialecto comunitario de SQLite con la **misma versión**. **No mezcles versiones de las dos dependencias de Hibernate**. Antes de introducir una dependencia nueva, verifica su compatibilidad con la versión de Java y con el resto del proyecto.
+
+```xml
+<dependencies>
+    <!-- Implementación de JPA y proveedor de EntityManager. -->
+    <dependency>
+        <groupId>org.hibernate.orm</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>7.4.11.Final</version>
+    </dependency>
+
+    <!-- Traduce operaciones Hibernate al dialecto de SQLite. -->
+    <dependency>
+        <groupId>org.hibernate.orm</groupId>
+        <artifactId>hibernate-community-dialects</artifactId>
+        <version>7.4.11.Final</version>
+    </dependency>
+
+    <!-- Driver JDBC real: el ORM sigue comunicándose mediante JDBC. -->
+    <dependency>
+        <groupId>org.xerial</groupId>
+        <artifactId>sqlite-jdbc</artifactId>
+        <version>3.46.1.0</version>
+    </dependency>
+
+    <!-- Pruebas; no forma parte de la aplicación en producción. -->
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>5.11.4</version>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
 ```
 
-Estas dos consultas expresan la misma relación interna. Una clave foránea no añade automáticamente la condición a una consulta ni es un requisito para utilizar `JOIN`.
+**Pregunta razonada:** ¿por qué Hibernate necesita `sqlite-jdbc`? Porque el ORM convierte acciones sobre objetos en SQL, pero el driver es el componente que establece la conexión y envía dicho SQL a la base de datos.
 
-**Investiga:** si un vehículo hace referencia a un cliente inexistente, ¿aparece en un `INNER JOIN` con clientes? ¿Qué obtendrías con un `LEFT JOIN` desde vehículos hacia clientes?
+**Prueba de fase:** ejecuta `mvn -version` y `mvn -DskipTests compile`. Si falla la descarga de librerías, revisa la red, la configuración de Maven y las coordenadas del POM antes de alterar el código Java.
 
-### Pista: activar la integridad referencial
+## C. `persistence.xml`: los ajustes que debes saber justificar
 
-La instrucción de SQLite empieza así:
+Archivo: `src/main/resources/META-INF/persistence.xml`. El nombre de la unidad debe coincidir **literalmente** con el usado en `Persistence.createEntityManagerFactory("tallerPU")`.
 
-```sql
-PRAGMA foreign_keys = ...;
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence" version="3.1">
+  <persistence-unit name="tallerPU" transaction-type="RESOURCE_LOCAL">
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+    <class>es.ejemplo.taller.orm.entity.ClienteEntity</class>
+    <class>es.ejemplo.taller.orm.entity.VehiculoEntity</class>
+    <class>es.ejemplo.taller.orm.entity.MecanicoEntity</class>
+    <class>es.ejemplo.taller.orm.entity.ReparacionEntity</class>
+    <class>es.ejemplo.taller.orm.entity.PiezaReparacionEntity</class>
+    <properties>
+      <property name="jakarta.persistence.jdbc.driver" value="org.sqlite.JDBC"/>
+      <property name="hibernate.dialect" value="org.hibernate.community.dialect.SQLiteDialect"/>
+      <property name="hibernate.hbm2ddl.auto" value="none"/>
+      <property name="hibernate.show_sql" value="false"/>
+    </properties>
+  </persistence-unit>
+</persistence>
 ```
 
-Sustituye los puntos suspensivos por el valor adecuado: la línea anterior es una pista, no una sentencia lista para ejecutar. Puedes consultar el estado mediante:
+- `RESOURCE_LOCAL`: nuestra aplicación controla `begin`, `commit` y `rollback`; no hay gestor de transacciones de servidor.
+- `provider`: indica qué implementación de JPA se utiliza.
+- `<class>`: registra cada entidad persistente. Si una falta, ciertas consultas o relaciones fallarán.
+- `hibernate.dialect`: adapta el SQL generado a SQLite.
+- `hbm2ddl.auto=none`: **no crea ni actualiza las tablas**; conserva el esquema entregado. No usar `create`/`create-drop` sobre los datos de trabajo.
+- `show_sql`: para estudiar SQL puede establecerse temporalmente a `true`, preferiblemente en una configuración local de desarrollo.
 
-```sql
-PRAGMA foreign_keys;
+**Conexión JDBC:** inspecciona `orm/config/OrmFactory.java`. Esta solución construye las propiedades de conexión en Java; la ubicación de la BD depende de la URL suministrada a esa fábrica. No dupliques una segunda URL incompatible dentro de `persistence.xml`.
+
+**Prueba de fase:** abre la fábrica, crea un `EntityManager`, comprueba `em.isOpen()`, cierra el gestor y finalmente la fábrica. Si aparece «Unknown entity», comprueba el paquete, `@Entity` y su registro en XML.
+
+## D. Entidades: explicación completa de cada anotación y cada decisión
+
+### D.1. Primera entidad: `ClienteEntity`
+
+Crea `orm/entity/ClienteEntity.java` y comienza con este esqueleto (añade constructor vacío, getters y setters):
+
+```java
+package es.ejemplo.taller.orm.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "clientes")
+public class ClienteEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_cliente")
+    private Integer idCliente;
+
+    @Column(name = "nombre")
+    private String nombre;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "telefono")
+    private String telefono;
+
+    public ClienteEntity() { }
+    // Generar getters y setters con el IDE.
+}
 ```
 
-Esta configuración se aplica a **cada conexión**. Activarla en una herramienta de consulta o en la conexión de preparación de una prueba no configura las conexiones que se abran después, *se ahí que se debe de hacer en un lugar o forma que siempre se active*.
+1. `@Entity` hace que JPA reconozca la clase como persistente. El nombre de entidad por defecto es `ClienteEntity` y es el utilizado en JPQL.
+2. `@Table(name = "clientes")` relaciona la clase con la tabla real; el nombre de clase **no tiene por qué** coincidir con la tabla.
+3. `@Id` señala la identidad de la entidad dentro de su tabla y del contexto de persistencia.
+4. `@GeneratedValue(IDENTITY)` indica que la clave se obtiene del mecanismo de inserción de la base de datos; antes de crear una fila nueva, el ID suele ser `null`.
+5. `@Column` relaciona el atributo Java con una columna SQL; las mayúsculas/minúsculas y convenciones de nombres importan según el proveedor.
+6. El constructor sin argumentos permite que JPA instancie la entidad. Los setters son necesarios para los ejercicios y para facilitar el trabajo con los mappers.
 
-En una copia de la base de datos, compara qué sucede al:
+**Evita** poner `@GeneratedValue` en `VehiculoEntity`: su matrícula es una clave natural proporcionada por la aplicación, no un entero autogenerado.
 
-- Insertar un vehículo cuyo cliente no existe.
-- Actualizar una reparación para asociarla a un mecánico inexistente.
-- Borrar un cliente que tiene vehículos asociados.
+### D.2. Segunda entidad: `VehiculoEntity`
 
-**Esta investigación es una actividad de aprendizaje; activar las claves foráneas en todos los DAO no es una condición obligatoria de esta entrega.** Las pruebas obligatorias no deben exigir el rechazo de referencias inválidas ni los borrados restringidos. Si realizas una ampliación específica de integridad, documenta cómo se configura la conexión y separa sus pruebas.
+```java
+@Entity
+@Table(name = "vehiculos")
+public class VehiculoEntity {
+    @Id
+    @Column(name = "matricula")
+    private String matricula;
 
-## 6. Segunda fase: implementar los DAO
+    @Column(name = "marca")
+    private String marca;
 
-Existen **33 métodos pendientes**: 25 operaciones CRUD y 8 consultas específicas.
+    @Column(name = "modelo")
+    private String modelo;
 
-| DAO | Métodos CRUD | Consultas específicas | Total |
-| --- | --- | --- | ---: |
-| `ClienteDao` | `listar`, `buscarPorId`, `insertar`, `actualizar`, `eliminar` | Ninguna | 5 |
-| `MecanicoDao` | Los cinco métodos CRUD | `buscarPorEspecialidad` | 6 |
-| `VehiculoDao` | Los cinco métodos CRUD | `buscarPorCliente`, `listarPorMarca` | 7 |
-| `ReparacionDao` | Los cinco métodos CRUD | `buscarPorVehiculo`, `buscarPorMecanico`, `listarPendientes` | 8 |
-| `PiezaReparacionDao` | Los cinco métodos CRUD | `listarPorReparacion`, `calcularCostePiezas` | 7 |
-| **Total** | **25** | **8** | **33** |
+    @Column(name = "anio")
+    private Integer anio;
 
-Orden recomendado: clientes, mecánicos, vehículos, reparaciones y piezas. Implementa y comprueba cada bloque antes de avanzar.
+    @Column(name = "id_cliente")
+    private Integer idCliente;
 
-### Contratos de los métodos
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_cliente", insertable = false, updatable = false)
+    private ClienteEntity cliente;
 
-Mantén las firmas públicas (definición de funciones) y los constructores de los DAO para conservar la compatibilidad con las pruebas.
+    public VehiculoEntity() { }
+    // Añadir getters y setters.
+}
+```
 
-| Operación | Resultado esperado |
-| --- | --- |
-| `listar` y filtros | Lista de objetos; lista vacía si no hay coincidencias; nunca `null` |
-| `buscarPorId` | `Optional` con el objeto si existe; `Optional.empty()` si no existe |
-| `insertar` con ID autogenerado | Identificador generado, positivo, si se inserta; `0` si se rechaza o falla |
-| `VehiculoDao.insertar` | `1` si se inserta; `0` si se rechaza o falla; la matrícula la aporta el objeto |
-| `actualizar` | Número de filas modificadas: normalmente `1`; `0` si no existe o la operación se rechaza o falla |
-| `eliminar` | Número de filas eliminadas: normalmente `1`; `0` si no existe o la operación se rechaza o falla |
-| `calcularCostePiezas` | Suma de `cantidad × precio_unitario`; `BigDecimal.ZERO` si no hay piezas |
+**Por qué hay dos representaciones de `id_cliente`:** `idCliente` representa directamente el valor de la columna y es quien lo escribe; `cliente` permite navegar hasta el objeto relacionado (`vehiculo.getCliente()`). Ambas apuntan a la **misma columna**. Si se permitiese escribir desde ambos campos, existirían dos rutas potencialmente contradictorias para actualizarla; por eso la asociación usa `insertable=false, updatable=false`.
 
-Las búsquedas por marca y especialidad usan coincidencia exacta, sin comodines añadidos ni normalización de mayúsculas. `listarPendientes` selecciona únicamente el estado `PENDIENTE`. Las pruebas no deben depender del orden de una lista salvo que se haya establecido expresamente un `ORDER BY` y un contrato de ordenación.
+**Consecuencia práctica:** `v.setCliente(otroCliente)` **no cambia por sí solo la FK** que se escribe en esta configuración; la operación de persistencia debe establecer `v.setIdCliente(otroCliente.getIdCliente())`. Además, si `cliente` ya estaba cargado en un contexto, actualizar la FK no sustituye automáticamente la referencia Java almacenada: conviene recargar la entidad o sincronizar el diseño conscientemente.
 
-En los casos límite: un objeto `null` en inserción o actualización devuelve `0`; un identificador `null` o un filtro textual nulo o en blanco devuelve ausencia, lista vacía o `0`, según el tipo de retorno. No interpretes un filtro vacío como una petición de listar toda la tabla.
+### D.3. Tercera entidad: `MecanicoEntity`
 
-### Requisitos de implementación
+Tiene `idMecanico`, `nombre`, `especialidad`, `tarifaHora`. El ID es generado y el importe debe conservarse en `BigDecimal` (no en `double` para cálculos monetarios exactos). Ejemplo de campos:
 
-- Utiliza `PreparedStatement` para los valores externos. No concatenes entradas en el SQL.
-- Gestiona `Connection`, `PreparedStatement` y `ResultSet` con `try-with-resources`.
-- Recupera los identificadores generados; no supongas que serán `1` ni que estarán libres determinados valores.
-- Respeta las restricciones de unicidad, nulabilidad y valores numéricos del esquema.
-- Gestiona `SQLException` internamente: no añadas `throws SQLException` a la API pública de los DAO.
-- Controla las entradas inválidas y las excepciones de ejecución previsibles. No utilices un `catch (RuntimeException)` indiscriminado para ocultar errores de programación.
-- Ante errores de acceso, proporciona un diagnóstico útil sin mostrar datos personales innecesarios. En esta práctica se conservan los retornos de respaldo indicados; explica que pueden confundir un fallo de consulta con la ausencia de resultados.
-- No uses los datos de ejemplo como resultados fijos ni adaptes el código a los valores concretos de las pruebas.
+```java
+@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+@Column(name = "id_mecanico")
+private Integer idMecanico;
 
-## 7. Tercera fase: centralizar el acceso a la base de datos
+@Column(name = "tarifa_hora")
+private BigDecimal tarifaHora;
+```
 
-Implementa `es.ejemplo.taller.infra.ConexionBD` después de comprender cómo funciona el acceso desde los primeros DAO. Se entrega únicamente su firma `public static Connection abrir(String url) throws SQLException`, con una excepción provisional, para que las 90 pruebas compilen desde el inicio. No se entrega su solución. Al finalizar, todos los DAO deben utilizar este punto común de apertura. Esta clase de infraestructura puede lanzar `SQLException`; son los métodos públicos de los DAO los que deben gestionarla internamente. **No obstante**, *para tu implementación*, puedes crear otro constructor de la clase **ConexionBD**.y hacer los cambios que estimes.
+**Actividad:** completa `@Entity`, `@Table(name="mecanicos")`, constructor, restantes columnas y accesores; comprueba que el fichero importa `java.math.BigDecimal`.
 
-### Un único punto de acceso y configuración
+### D.4. Cuarta entidad: `ReparacionEntity`
 
-Centralizar la creación de conexiones permite:
+Una reparación se identifica por `idReparacion`. Contiene `matricula`, `idMecanico`, `descripcion`, `fecha`, `horasTrabajo` y `estado` y puede navegar a `VehiculoEntity` y `MecanicoEntity`:
 
-- Evitar repetir rutas, construcción de URL y configuración.
-- Comprobar la existencia del archivo de forma uniforme.
-- Mantener un tratamiento coherente de los errores.
-- Cambiar de base de trabajo a base temporal de pruebas sin modificar los DAO.
-- Aplicar configuraciones comunes, si se decide utilizarlas.
+```java
+@Column(name = "matricula")
+private String matricula;
 
-Aquí «conexión única» significa **una única clase responsable de crear y configurar las conexiones**, no una conexión global abierta permanentemente. Cada operación puede abrir su conexión y cerrarla con `try-with-resources`. Una conexión estática asociada a una ruta fija dificultaría el aislamiento de las pruebas.
+@Column(name = "id_mecanico")
+private Integer idMecanico;
 
-### Comprobar el archivo antes de conectar
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "matricula", insertable = false, updatable = false)
+private VehiculoEntity vehiculo;
 
-SQLite puede crear una base vacía al conectarse a una ruta inexistente. Por ello, abrir una conexión sin error no demuestra que se haya localizado la base esperada. **Controla esta a través de un constructor común** tal y como hemos trabajado en clase.
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "id_mecanico", insertable = false, updatable = false)
+private MecanicoEntity mecanico;
+```
 
-La clase debe:
+**Comprende la cardinalidad:** muchas reparaciones pertenecen al mismo vehículo y muchas reparaciones pueden estar asignadas al mismo mecánico. Por eso **ambas** relaciones son `@ManyToOne`. No se utiliza `@ManyToMany`: no existe una tabla puente entre `reparaciones` y `mecanicos` para permitir varios mecánicos por reparación en este diseño.
 
-1. Mantener `ConexionBD.abrir(String url) throws SQLException` para que las pruebas compilen. Recibe una URL `jdbc:sqlite:` con una ruta de archivo, incluida la URL temporal que recibe cada DAO. Para este ejercicio no es necesario admitir bases en memoria ni URL URI.
-2. Comprobar, **antes de llamar a JDBC**, que la ruta corresponde a un archivo regular, existente y legible.
-3. Si falta, informar del problema y no crear silenciosamente otro archivo ni directorios.
-4. Si existe, intentar conectar y gestionar el posible error de acceso.
-5. Permitir comprobar que la base contiene las cinco tablas esperadas. Un archivo existente no garantiza que sea una base SQLite válida ni que tenga el esquema correcto.
+La propiedad `fecha` es `String` en esta versión. En un diseño nuevo podría ser `LocalDate`, **pero no la cambies aislada**: antes revisa el formato de la columna, los valores existentes, los mappers y las pruebas.
 
-**Pista:** investiga `Path`, `Files.exists`, `Files.isRegularFile` y `Files.isReadable`. Evita depender de rutas absolutas de tu equipo. El control de existencia de este ejercicio se plantea para bases SQLite almacenadas en archivos.
+### D.5. Quinta entidad: `PiezaReparacionEntity`
 
-## 8. Cuarta fase: implementar una refactorización con clase abstracta
+```java
+@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+@Column(name = "id_pieza")
+private Integer idPieza;
 
-**Los DAO iniciales son independientes: no incluyen `AbstractDao`, ni deben incorporar un `extends` hacia una clase inexistente.** Primero consigue una implementación funcional; después estudia la refactorización.
+@Column(name = "id_reparacion")
+private Integer idReparacion;
 
-Una clase abstracta puede contener estado y métodos ya implementados, junto con operaciones abstractas que deben completar las subclases. No puede instanciarse directamente.
+@Column(name = "cantidad")
+private Integer cantidad;
 
-### Ventajas en este proyecto
+@Column(name = "precio_unitario")
+private BigDecimal precioUnitario;
 
-- Reducir la repetición de mecanismos de acceso y tratamiento común de resultados o errores.
-- Mantener un criterio uniforme en operaciones compartidas.
-- Corregir un comportamiento común en un único lugar.
-- Separar los pasos generales de las consultas y del mapeo específico de cada tabla.
-- Utilizar genéricos para expresar tipos con más seguridad.
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "id_reparacion", insertable = false, updatable = false)
+private ReparacionEntity reparacion;
+```
 
-No todo debe ir a la clase base: el SQL, los parámetros y la conversión de filas pueden variar entre entidades. Evita una abstracción que necesite numerosas excepciones para cada DAO.
+Cada fila representa una pieza utilizada en una reparación; una reparación puede tener varias filas de piezas. El coste de una fila es `precioUnitario × cantidad`, **no** solo `precioUnitario`.
 
-**Pistas de diseño:** ¿qué partes se repiten realmente? ¿Qué responsabilidad corresponde a `ConexionBD` y cuál al DAO? ¿Cómo representarías tanto una clave `Integer` como una matrícula `String`? Una posible dirección es `AbstractDao<T, ID>`; debes justificar tu diseño antes de implementarlo.
+### D.6. Tabla de decisiones de mapeo
 
-La refactorización con clase abstracta forma parte de la entrega evaluable. Debes crearla tú: no se entrega ningún archivo `AbstractDao.java` ni un `extends` provisional. Una vez creadas y probadas las operaciones básicas, diseña la abstracción e integra los cinco DAO, manteniendo sus constructores y firmas públicas. La clase base debe reutilizar comportamiento real; declararla sin uso o crear una clase vacía no cumple este objetivo. Las pruebas funcionales no inspeccionan la jerarquía: este criterio se revisa mediante el código y tu explicación.
+| Situación | Anotación / tipo | Motivo |
+|---|---|---|
+| Tabla existente con otro nombre | `@Table(name="...")` | Evita depender de convenciones de nombres |
+| Clave primaria | `@Id` | Identidad de persistencia |
+| Entero autogenerado | `@GeneratedValue(IDENTITY)` | La BD asigna el valor |
+| Matrícula introducida por el usuario | Solo `@Id` | La aplicación conoce el ID |
+| Nombre SQL diferente | `@Column(name="...")` | Evita columnas incorrectas |
+| Relación N:1 | `@ManyToOne` | La FK está en esta tabla |
+| Especificar columna FK | `@JoinColumn` | Enlaza la asociación con la FK |
+| FK ya mapeada como campo | `insertable=false, updatable=false` en la asociación | Una única ruta de escritura |
+| Asociación diferida | `fetch=LAZY` | Reduce cargas innecesarias, exige contexto abierto al acceder |
 
-## 9. Pruebas: cuántas hay que superar
+## E. Relaciones bidireccionales: ampliación opcional y riesgos
 
-### Suite entregada: 90 pruebas obligatorias
+El proyecto **solo necesita** relaciones unidireccionales `@ManyToOne`. Si quieres acceder desde un cliente a su lista de vehículos, puedes añadir en `ClienteEntity`:
 
-Este proyecto ya incluye **90 métodos `@Test` ejecutables**, sin necesidad de escribirlos ni habilitarlos para comenzar. 
+```java
+@OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
+private List<VehiculoEntity> vehiculos = new ArrayList<>();
+```
 
-| Clase | Número de pruebas |
-| --- | ---: |
-| `ClienteDaoTest` | 10 |
-| `MecanicoDaoTest` | 10 |
-| `VehiculoDaoTest` | 10 |
-| `ReparacionDaoTest` | 10 |
-| `PiezaReparacionDaoTest` | 10 |
-| `Test sobre dao´s específicos` | 40 |
-| **Total** | **90** |
+**Explicación:** `mappedBy="cliente"` apunta al **nombre del campo Java** `VehiculoEntity.cliente`, no a la columna `id_cliente`. El lado inverso no tiene su propia `@JoinColumn`; la FK sigue estando en `vehiculos`. De forma análoga se podrían añadir `reparaciones` a `VehiculoEntity` y `MecanicoEntity`, y `piezas` a `ReparacionEntity`.
 
-**Objetivo final: 90 pruebas ejecutadas, 0 fallos, 0 errores y 0 omitidas.** La clase abstracta se evalúa además mediante revisión del diseño: pasar los tests no demuestra por sí solo que la hayas implementado.
+**Precauciones:**
 
-El proyecto inicial compila (incluidas las clases de prueba), pero los DAO devuelven resultados provisionales y `ConexionBD.abrir` lanza una excepción de tarea pendiente. Es normal encontrar fallos y errores al ejecutar la suite inicial. Algunos casos negativos pasan incluso antes de implementar sus métodos: eso no acredita que estén resueltos.
+1. Esto añade colecciones diferidas. Leerlas después de cerrar el `EntityManager` puede lanzar `LazyInitializationException`.
+2. Con el diseño de FK escalar de esta solución, cambiar solo la lista o la referencia inversa **no modifica** automáticamente la columna FK escrita. Hay que mantener coherente `idCliente`.
+3. No añadas `CascadeType.ALL` sin analizar el efecto de borrar un cliente o una reparación: podrías borrar registros que no quieres eliminar.
+4. No incluyas relaciones bidireccionales indiscriminadamente en `toString()`, `equals()` o serialización JSON: pueden producir ciclos y cargas no deseadas.
 
-`BaseTest` prepara una copia temporal vacía por prueba y utiliza JDBC directamente para el montaje, por lo que no necesita una `ConexionBD` resuelta. Los dos casos de archivo y plantilla válidos requieren implementar `ConexionBD`; no se espera que pasen inicialmente. No modifiques la base de trabajo para satisfacer las pruebas. Los informes se generan en `target/surefire-reports/`.
+**Ejercicio:** representa qué lado guarda físicamente la FK en cada asociación bidireccional. Después implementa únicamente `ClienteEntity.vehiculos`, consulta la colección **dentro** del gestor y explica por qué funciona.
 
-| Bloque adicional | Pruebas |
-| --- | ---: |
-| Archivo, esquema y conexión | 6 |
-| Entradas y resultados vacíos | 10 |
-| Actualizaciones persistidas | 5 |
-| Borrados persistidos | 5 |
-| Filtros con múltiples registros | 7 |
-| Coste de piezas | 4 |
-| Identificadores y aislamiento | 3 |
-| **Total adicional ya incluido** | **40** |
+## F. `EntityManager` como máquina de estados: seguimiento de una sesión
 
-### Cómo interpretar y completar las pruebas
+```java
+EntityManager em = factory.createEntityManager();
+EntityTransaction tx = em.getTransaction();
+try {
+    tx.begin();
+    ClienteEntity cliente = new ClienteEntity();  // transient
+    cliente.setNombre("Prueba ORM");
+    cliente.setEmail("prueba@example.org");
+    em.persist(cliente);                          // managed
+    em.flush();                                   // sincroniza SQL; NO confirma
+    Integer id = cliente.getIdCliente();
+    ClienteEntity otraReferencia = em.find(ClienteEntity.class, id);
+    System.out.println(cliente == otraReferencia); // true en el mismo contexto
+    tx.rollback();                                // descarta cambios de BD
+} finally {
+    em.close();
+}
+```
 
-- Los 90 casos ya son pruebas independientes. Si añades pruebas propias, identifica su finalidad y distingue el nuevo total de las 90 entregadas.
-- Conserva los archivos entregados. Los casos de conexión positiva pasarán cuando implementes `ConexionBD`.
-- Usa nombres descriptivos en lugar de `caso01`.
-- Captura los IDs devueltos. No supongas que el primer registro tiene identificador `1`.
-- Los filtros deben comprobar las identidades exactas de los resultados, no solo su cantidad. Prepara varios registros coincidentes y otros que deban quedar fuera.
-- En actualizaciones, consulta de nuevo y comprueba el estado almacenado, además del retorno.
-- En borrados, consulta después y verifica que otros registros siguen presentes. Utiliza registros sin dependencias para estos casos obligatorios.
-- Para costes, compara `BigDecimal` numéricamente mediante `compareTo`: la escala no debe provocar falsos fallos.
-- Ejemplo de cálculo: dos unidades de `10.25` y tres de `0.10` deben sumar `20.80`.
-- La prueba de inserción de vehículos ya consulta su existencia tras insertarlo; el ayudante también comprueba la inserción.
+**Analiza cada línea:**
 
-Las pruebas de claves foráneas inválidas y borrados restringidos quedan **fuera de esos 90 casos**. Pueden añadirse como ampliación opcional con integridad activada y configuración explícita; no deben exigir esa configuración a la implementación básica.
+- `createEntityManager`: abre un **contexto de persistencia**, no la fábrica. La fábrica es compartible, pero un `EntityManager` no debe compartirse entre hilos.
+- `tx.begin()`: marca el comienzo de una unidad atómica de trabajo.
+- `new`: objeto transitorio; no está asociado a la base de datos.
+- `persist`: lo convierte en administrado; el SQL se ejecuta en el momento oportuno según proveedor y generación de ID.
+- `flush`: intenta sincronizar operaciones pendientes con la base de datos; **no sustituye a `commit`**.
+- `find`: busca por identificador; si el objeto ya está en el contexto devuelve la misma instancia administrada.
+- `rollback`: anula la transacción en la base de datos; no garantiza restaurar todos los valores Java de las instancias ya modificadas. Es aconsejable desechar el gestor tras un error.
+- `close`: las entidades supervivientes dejan de estar administradas por ese gestor.
 
-## 10. Entrega del alumnado
+**Cambios automáticos:**
 
-Entrega:
+```java
+var tx = em.getTransaction();
+tx.begin();
+ClienteEntity c = em.find(ClienteEntity.class, idExistente);
+if (c != null) c.setTelefono("600000000");
+tx.commit(); // dirty checking: si cambió una entidad administrada, se sincroniza
+```
 
-- Código fuente de los DAO implementados.
-- `consultas.sql` con las 10 actividades y comentarios.
-- Las 90 pruebas entregadas, conservadas sin eliminar ni desactivar; si añades casos propios, identifica su número y su finalidad.
-- Una memoria breve, en un archivo propio distinto de este README, con decisiones sobre errores, comprobación de archivos y resultados de la investigación de integridad referencial.
-- `ConexionBD`, tu clase abstracta y los cinco DAO refactorizados, junto con una justificación del reparto de responsabilidades.
-- Resultado final de `mvn clean test`, identificando qué suite has ejecutado.
+**`merge` no significa “guardar cualquier cosa sin consecuencias”:** devuelve una **instancia administrada** distinta cuando se aplica sobre un objeto desconectado. Utiliza la instancia devuelta si vas a seguir modificándola; comprueba primero si existe cuando tu contrato de repositorio exija que `update()` devuelva `false` para IDs inexistentes.
 
-No entregues `target/`, rutas personales, bases temporales ni una solución que sustituya las pruebas por resultados prefijados. Conserva las bases originales para que la práctica se pueda reproducir.
+## G. Crear el repositorio de manera incremental
 
-## 11. Rúbrica de evaluación — 100 puntos
+### G.1. Primero, repositorio concreto y fácil de depurar
 
-La evaluación combina pruebas, revisión del código, consultas y explicación. La clase abstracta es un objetivo evaluable de la entrega final, aunque no sea necesaria para empezar a trabajar.
+```java
+public final class ClienteRepositorioInicial {
+    private final EntityManagerFactory factory;
 
-| Criterio | Máximo | Logro completo | Logro parcial | Insuficiente |
-| --- | ---: | --- | --- | --- |
-| Funcionalidad y contratos de los 33 métodos DAO | 25 | CRUD, filtros, retornos, IDs y costes correctos; se comprueba persistencia | Parte funcional, con errores localizados o contratos incompletos | Métodos pendientes, resultados prefijados o errores generalizados |
-| Clase abstracta y refactorización de los cinco DAO | 20 | Clase creada por el alumno, usada por los cinco DAO, con comportamiento común real; resuelve las claves Integer y String con tipos adecuados y mantiene la API | Abstracción útil pero integrada solo en algunos DAO, o con duplicación o diseño de tipos mejorable | No existe, está vacía, no se utiliza o solo añade herencia sin reutilización |
-| ConexionBD y comprobación de la BBDD | 15 | Apertura centralizada utilizada por todos los DAO; verifica archivo antes de conectar, comprueba las cinco tablas, gestiona fallos y conserva el aislamiento | Centralización o comprobaciones incompletas; algún DAO abre conexiones por separado | No comprueba existencia, crea otra base por error o utiliza una conexión global que mezcla las pruebas |
-| JDBC, recursos, validación y errores | 15 | PreparedStatement con valores externos, try-with-resources, entradas inválidas controladas y diagnóstico útil sin ocultar errores de programación | Aplicación irregular de los criterios o validaciones incompletas | Concatenación de valores, fugas de recursos o errores silenciados indiscriminadamente |
-| Pruebas y comprensión de sus resultados | 10 | Las 90 pasan sin alterarlas; explica preparación, retorno, estado e independencia de casos | Suite conservada con fallos pendientes; explica solo parte de los casos | Omite o desactiva pruebas, cambia expectativas para ocultar fallos o no puede explicar los resultados |
-| Diez actividades SQL y modelo relacional | 10 | Consultas correctas, incluyen casos sin coincidencias donde procede y explicación de JOIN, WHERE y agregaciones | Consultas o explicaciones parcialmente correctas | Consultas ausentes o no comprenden las relaciones |
-| Claridad y memoria técnica | 5 | Código legible, decisiones justificadas, investigación de integridad y entrega reproducible sin target | Documentación o presentación incompleta | Falta de explicación o entrega difícil de reproducir |
-| **Total** | **100** | | | |
+    public ClienteRepositorioInicial(EntityManagerFactory factory) {
+        this.factory = factory;
+    }
 
-Para puntuar cada criterio se utiliza el nivel de logro: **completo = 100 % de sus puntos; parcial alto = 75 %; parcial básico = 50 %; insuficiente con evidencias mínimas = 25 %; ausente o no demostrable = 0 %**. La revisión debe indicar las evidencias que justifican cada nivel. La nota sobre 10 se obtiene dividiendo los puntos entre 10.
+    public Optional<ClienteEntity> buscar(Integer id) {
+        try (EntityManager em = factory.createEntityManager()) {
+            return Optional.ofNullable(em.find(ClienteEntity.class, id));
+        }
+    }
+}
+```
 
-La integridad referencial activada no aporta ni resta puntos por sí sola: se valora que expliques su efecto y su independencia respecto a JOIN. No se exige que los DAO la activen. La ausencia de clase abstracta implica 0 puntos en ese criterio, aunque las 90 pruebas pasen.
+**Importante:** este ejemplo devuelve **entidades**, únicamente para comprender JPA. La solución final devuelve objetos del paquete `modelo` usando mappers y no expone clases JPA al resto de la aplicación.
 
-## 12. Lista de comprobación antes de entregar
+### G.2. Extraer un helper de escritura transaccional
 
-- [ ] He resuelto las 10 actividades en `consultas.sql`.
-- [ ] Los 33 métodos DAO cumplen sus contratos.
-- [ ] Los cinco DAO utilizan `ConexionBD` para abrir conexiones.
-- [ ] La clase de conexión comprueba el archivo antes de intentar abrirlo y verifica las tablas.
-- [ ] He creado una clase abstracta, integrada con los cinco DAO, que reutiliza código real.
-- [ ] He conservado los constructores y las firmas que utilizan las pruebas.
-- [ ] Pasan las 90 pruebas entregadas, sin omitirlas ni cambiar sus expectativas.
-- [ ] Puedo explicar los resultados esperados de los casos del siguiente catálogo.
-- [ ] La memoria explica mi diseño y la investigación sobre claves foráneas.
-- [ ] El ZIP final no incluye `target/` ni archivos temporales.
+```java
+private <R> R escribir(Function<EntityManager, R> accion) {
+    try (EntityManager em = factory.createEntityManager()) {
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            R resultado = accion.apply(em);
+            tx.commit();
+            return resultado;
+        } catch (RuntimeException e) {
+            if (tx.isActive()) tx.rollback();
+            throw e;
+        }
+    }
+}
+```
 
-## 13. Catálogo individual: preparación, operación y resultado esperado
+Cada operación de escritura debe ejecutar `commit` cuando todo sale bien y `rollback` si falla. **No** hagas `commit` en `finally`: eso podría confirmar datos tras un error. Tampoco cierres la `EntityManagerFactory` por cada operación, solo cuando la aplicación termina.
 
+### G.3. Pasar a `AbstractOrmRepository`
 
-Las 50 pruebas de partida conservan sus nombres para facilitar la comparación. Cada caso es un `@Test` independiente.
+La clase real `orm/repository/AbstractOrmRepository.java` mantiene los tipos `<T,E,ID>`: `T` es **dominio**, `E` es **entidad JPA**, `ID` es el **tipo de clave**. Utiliza funciones que reciben y devuelven objetos de ambos mundos; así el CRUD es reutilizable.
 
-`BaseTest` prepara para cada prueba una copia temporal vacía. Los ayudantes insertan las dependencias necesarias: `cliente()` crea Ana; `mecanico()` crea Luis; `vehiculo()` crea propietario y Seat 1234ABC; `reparacion()` añade mecánico y revisión pendiente; `pieza()` añade dos filtros a 10.00. Los IDs se recuperan de las inserciones o de los objetos consultados.
+```java
+// En ClienteOrmRepository: la referencia a cada función define el mapeo.
+super(factory,
+      ClienteEntity.class,
+      ClienteMapper::toEntity,
+      ClienteMapper::toDomain,
+      Cliente::getIdCliente,
+      (dominio, entidad) -> dominio.setIdCliente(entidad.getIdCliente()));
+```
 
-| Prueba | Preparación y operación (Java ejecutado) | Resultado esperado |
-| --- | --- | --- |
-| `ClienteDaoTest.caso01` | `assertTrue(cliente()>0);` | Insertar Ana devuelve un ID positivo |
-| `ClienteDaoTest.caso02` | `int id=cliente(); assertEquals("Ana",clientes.buscarPorId(id).orElseThrow().getNombre());` | Buscar el ID insertado devuelve nombre Ana |
-| `ClienteDaoTest.caso03` | `assertTrue(clientes.buscarPorId(999).isEmpty());` | Buscar 999 devuelve Optional.empty |
-| `ClienteDaoTest.caso04` | `cliente(); assertEquals(1,clientes.listar().size());` | Listar tras una inserción devuelve una lista de tamaño 1 |
-| `ClienteDaoTest.caso05` | `int id=cliente(); assertEquals(1,clientes.actualizar(new Cliente(id,"Eva","eva@example.com","666")));` | Actualizar Ana por Eva devuelve 1 |
-| `ClienteDaoTest.caso06` | `int id=cliente(); clientes.actualizar(new Cliente(id,"Eva","eva@example.com","666")); assertEquals("Eva",clientes.buscarPorId(id).orElseThrow().getNombre());` | Consultar después de actualizar devuelve nombre Eva |
-| `ClienteDaoTest.caso07` | `int id=cliente(); assertEquals(1,clientes.eliminar(id));` | Eliminar el ID existente devuelve 1 |
-| `ClienteDaoTest.caso08` | `assertEquals(0,clientes.eliminar(999));` | Eliminar 999 devuelve 0 |
-| `ClienteDaoTest.caso09` | `cliente(); assertEquals(0,clientes.insertar(new Cliente(null,"Luis","ana@example.com","666")));` | Insertar correo duplicado devuelve 0 |
-| `ClienteDaoTest.caso10` | `assertEquals(0,clientes.insertar(null));` | Insertar null devuelve 0 |
-| `MecanicoDaoTest.caso01` | `assertTrue(mecanico()>0);` | Insertar Luis devuelve un ID positivo |
-| `MecanicoDaoTest.caso02` | `int id=mecanico(); assertTrue(mecanicos.buscarPorId(id).isPresent());` | Buscar el ID insertado devuelve un Optional presente |
-| `MecanicoDaoTest.caso03` | `assertTrue(mecanicos.buscarPorId(999).isEmpty());` | Buscar 999 devuelve Optional.empty |
-| `MecanicoDaoTest.caso04` | `mecanico(); assertEquals(1,mecanicos.listar().size());` | Listar tras una inserción devuelve tamaño 1 |
-| `MecanicoDaoTest.caso05` | `mecanico(); assertEquals(1,mecanicos.buscarPorEspecialidad("Motor").size());` | Filtrar Motor devuelve tamaño 1 |
-| `MecanicoDaoTest.caso06` | `mecanico(); assertEquals(0,mecanicos.buscarPorEspecialidad("Chapa").size());` | Filtrar Chapa sin coincidencias devuelve tamaño 0 |
-| `MecanicoDaoTest.caso07` | `int id=mecanico(); assertEquals(1,mecanicos.actualizar(new Mecanico(id,"Luis","Chapa",new BigDecimal("50"))));` | Actualizar especialidad y tarifa devuelve 1 |
-| `MecanicoDaoTest.caso08` | `int id=mecanico(); assertEquals(1,mecanicos.eliminar(id));` | Eliminar el mecánico devuelve 1 |
-| `MecanicoDaoTest.caso09` | `assertEquals(0,mecanicos.insertar(new Mecanico(null,"Eva","Chapa",new BigDecimal("-1"))));` | Insertar tarifa -1 devuelve 0 |
-| `MecanicoDaoTest.caso10` | `assertEquals(0,mecanicos.actualizar(null));` | Actualizar null devuelve 0 |
-| `VehiculoDaoTest.caso01` | `String m=vehiculo(); assertEquals("1234ABC",m); assertTrue(vehiculos.buscarPorId(m).isPresent());` | Insertar 1234ABC permite recuperarlo y conserva la matrícula |
-| `VehiculoDaoTest.caso02` | `String m=vehiculo(); assertTrue(vehiculos.buscarPorId(m).isPresent());` | Buscar matrícula insertada devuelve Optional presente |
-| `VehiculoDaoTest.caso03` | `assertTrue(vehiculos.buscarPorId("NO").isEmpty());` | Buscar NO devuelve Optional.empty |
-| `VehiculoDaoTest.caso04` | `vehiculo(); assertEquals(1,vehiculos.listar().size());` | Listar tras insertar devuelve tamaño 1 |
-| `VehiculoDaoTest.caso05` | `String m=vehiculo(); int id=vehiculos.buscarPorId(m).orElseThrow().getIdCliente(); assertEquals(1,vehiculos.buscarPorCliente(id).size());` | Buscar por propietario obtenido devuelve tamaño 1 |
-| `VehiculoDaoTest.caso06` | `vehiculo(); assertEquals(0,vehiculos.buscarPorCliente(99).size());` | Buscar propietario 99 devuelve tamaño 0 |
-| `VehiculoDaoTest.caso07` | `vehiculo(); assertEquals(1,vehiculos.listarPorMarca("Seat").size());` | Filtrar Seat devuelve tamaño 1 |
-| `VehiculoDaoTest.caso08` | `String m=vehiculo(); int id=vehiculos.buscarPorId(m).orElseThrow().getIdCliente(); assertEquals(1,vehiculos.actualizar(new Vehiculo(m,"Ford","Focus",2020,id)));` | Actualizar vehículo existente devuelve 1 |
-| `VehiculoDaoTest.caso09` | `String m=vehiculo(); assertEquals(1,vehiculos.eliminar(m));` | Eliminar vehículo existente devuelve 1 |
-| `VehiculoDaoTest.caso10` | `String m=vehiculo(); int id=vehiculos.buscarPorId(m).orElseThrow().getIdCliente(); assertEquals(0,vehiculos.insertar(new Vehiculo(m,"Seat","Ibiza",2018,id)));` | Insertar matrícula duplicada devuelve 0 |
-| `ReparacionDaoTest.caso01` | `assertTrue(reparacion()>0);` | Insertar reparación devuelve ID positivo |
-| `ReparacionDaoTest.caso02` | `int id=reparacion(); assertTrue(reparaciones.buscarPorId(id).isPresent());` | Buscar ID insertado devuelve Optional presente |
-| `ReparacionDaoTest.caso03` | `assertTrue(reparaciones.buscarPorId(999).isEmpty());` | Buscar 999 devuelve Optional.empty |
-| `ReparacionDaoTest.caso04` | `reparacion(); assertEquals(1,reparaciones.listar().size());` | Listar tras insertar devuelve tamaño 1 |
-| `ReparacionDaoTest.caso05` | `reparacion(); assertEquals(1,reparaciones.buscarPorVehiculo("1234ABC").size());` | Buscar por 1234ABC devuelve tamaño 1 |
-| `ReparacionDaoTest.caso06` | `int id=reparacion(); int mec=reparaciones.buscarPorId(id).orElseThrow().getIdMecanico(); assertEquals(1,reparaciones.buscarPorMecanico(mec).size());` | Buscar por mecánico obtenido devuelve tamaño 1 |
-| `ReparacionDaoTest.caso07` | `reparacion(); assertEquals(1,reparaciones.listarPendientes().size());` | Listar pendientes devuelve tamaño 1 |
-| `ReparacionDaoTest.caso08` | `int id=reparacion(); int mec=reparaciones.buscarPorId(id).orElseThrow().getIdMecanico(); assertEquals(1,reparaciones.actualizar(new Reparacion(id,"1234ABC",mec,"Ok","2026-01-11",new BigDecimal("3"),"FINALIZADA")));` | Actualizar reparación existente devuelve 1 |
-| `ReparacionDaoTest.caso09` | `int id=reparacion(); assertEquals(1,reparaciones.eliminar(id));` | Eliminar reparación existente devuelve 1 |
-| `ReparacionDaoTest.caso10` | `String m=vehiculo(); int mec=mecanico(); assertEquals(0,reparaciones.insertar(new Reparacion(null,m,mec,"Error","2026-01-10",new BigDecimal("2"),"INVALIDA")));` | Insertar estado INVALIDA devuelve 0 |
-| `PiezaReparacionDaoTest.caso01` | `assertTrue(pieza()>0);` | Insertar pieza devuelve ID positivo |
-| `PiezaReparacionDaoTest.caso02` | `int id=pieza(); assertTrue(piezas.buscarPorId(id).isPresent());` | Buscar ID insertado devuelve Optional presente |
-| `PiezaReparacionDaoTest.caso03` | `assertTrue(piezas.buscarPorId(999).isEmpty());` | Buscar 999 devuelve Optional.empty |
-| `PiezaReparacionDaoTest.caso04` | `pieza(); assertEquals(1,piezas.listar().size());` | Listar tras insertar devuelve tamaño 1 |
-| `PiezaReparacionDaoTest.caso05` | `int id=pieza(); int rep=piezas.buscarPorId(id).orElseThrow().getIdReparacion(); assertEquals(1,piezas.listarPorReparacion(rep).size());` | Filtrar por reparación obtenida devuelve tamaño 1 |
-| `PiezaReparacionDaoTest.caso06` | `int id=pieza(); int rep=piezas.buscarPorId(id).orElseThrow().getIdReparacion(); assertEquals(0,piezas.calcularCostePiezas(rep).compareTo(new BigDecimal("20")));` | Coste de dos filtros a 10.00 devuelve 20.00 |
-| `PiezaReparacionDaoTest.caso07` | `int id=pieza(); int rep=piezas.buscarPorId(id).orElseThrow().getIdReparacion(); assertEquals(1,piezas.actualizar(new PiezaReparacion(id,rep,"Filtro",3,new BigDecimal("15"))));` | Actualizar pieza existente devuelve 1 |
-| `PiezaReparacionDaoTest.caso08` | `int id=pieza(); assertEquals(1,piezas.eliminar(id));` | Eliminar pieza existente devuelve 1 |
-| `PiezaReparacionDaoTest.caso09` | `int rep=reparacion(); assertEquals(0,piezas.insertar(new PiezaReparacion(null,rep,"F",0,new BigDecimal("10"))));` | Insertar cantidad 0 devuelve 0 |
-| `PiezaReparacionDaoTest.caso10` | `assertEquals(0,piezas.insertar(null));` | Insertar null devuelve 0 |
-| `AmpliacionTest.archivoTrabajoValido` | Base de ejemplo entregada | Abrir con ConexionBD | Conexión abierta y cinco tablas presentes |
-| `AmpliacionTest.plantillaVaciaValida` | Plantilla original | Abrir y contar las cinco tablas | Conexión abierta; 0 filas en cada tabla |
-| `AmpliacionTest.rutaInexistenteNoCreaArchivo` | Ruta sin archivo dentro de directorio temporal | Intentar abrir | SQLException y el archivo sigue sin existir |
-| `AmpliacionTest.directorioNoEsBase` | Directorio temporal | Intentar abrir como BBDD | SQLException; sigue siendo directorio |
-| `AmpliacionTest.archivoNoSqlite` | Archivo con texto ordinario | Intentar abrir | SQLException; no se acepta como BBDD |
-| `AmpliacionTest.baseSinTablas` | BBDD SQLite con una tabla ajena | Intentar abrir | SQLException por esquema incompleto |
-| `AmpliacionTest.listarClientesVacios` | Plantilla vacía | listar | Lista no nula de tamaño 0 |
-| `AmpliacionTest.listarMecanicosVacios` | Plantilla vacía | listar | Lista no nula de tamaño 0 |
-| `AmpliacionTest.listarVehiculosVacios` | Plantilla vacía | listar | Lista no nula de tamaño 0 |
-| `AmpliacionTest.listarReparacionesVacios` | Plantilla vacía | listar | Lista no nula de tamaño 0 |
-| `AmpliacionTest.listarPiezasVacios` | Plantilla vacía | listar | Lista no nula de tamaño 0 |
-| `AmpliacionTest.nombreClienteBlanco` | Cliente con nombre de espacios | insertar | 0; no se guarda cliente |
-| `AmpliacionTest.especialidadMecanicoBlanca` | Mecánico con especialidad en blanco | insertar | 0; no se guarda mecánico |
-| `AmpliacionTest.matriculaVacia` | Cliente existente y matrícula vacía | insertar vehículo | 0; no se guarda vehículo |
-| `AmpliacionTest.reparacionNula` | Base vacía | insertar null | 0; no se guarda reparación |
-| `AmpliacionTest.marcaNula` | Un vehículo existente | listarPorMarca(null) | Lista no nula de tamaño 0 |
-| `AmpliacionTest.actualizarClientePersiste` | Cliente Ana existente | Modificar nombre, email y teléfono; recuperar | 1; Eva, eva@ejemplo.com y 777 |
-| `AmpliacionTest.actualizarMecanicoPersiste` | Mecánico existente | Modificar nombre, especialidad y tarifa; recuperar | 1; Eva, Chapa y 50.25 |
-| `AmpliacionTest.actualizarVehiculoPersiste` | Vehículo y un segundo propietario | Modificar marca, modelo, año y propietario; recuperar | 1; Ford, Focus, 2020 y el nuevo propietario |
-| `AmpliacionTest.actualizarReparacionPersiste` | Reparación; segundo vehículo y mecánico | Modificar todos los campos no clave; recuperar | 1; nuevos vínculos, descripción, fecha, horas y estado |
-| `AmpliacionTest.actualizarPiezaPersiste` | Pieza y segunda reparación | Modificar reparación, nombre, cantidad y precio; recuperar | 1; nueva reparación, Aceite, 3 y 15.25 |
-| `AmpliacionTest.borrarClientePersiste` | Dos clientes sin dependencias | Borrar el primero y consultar ambos | 1; primero ausente y segundo presente |
-| `AmpliacionTest.borrarMecanicoPersiste` | Dos mecánicos sin reparaciones | Borrar el primero y consultar ambos | 1; primero ausente y segundo presente |
-| `AmpliacionTest.borrarVehiculoPersiste` | Dos vehículos sin reparaciones | Borrar el primero y consultar ambos | 1; primero ausente y segundo presente |
-| `AmpliacionTest.borrarReparacionPersiste` | Dos reparaciones sin piezas | Borrar la primera y consultar ambas | 1; primera ausente y segunda presente |
-| `AmpliacionTest.borrarPiezaPersiste` | Dos piezas | Borrar la primera y consultar ambas | 1; primera ausente y segunda presente |
-| `AmpliacionTest.filtrarEspecialidadMultiples` | Dos Motor y un Chapa | buscarPorEspecialidad Motor | Exactamente los dos IDs de Motor |
-| `AmpliacionTest.filtrarPropietarioMultiples` | Dos vehículos de A y uno de B | buscarPorCliente A | Exactamente las matrículas A1 y A2 |
-| `AmpliacionTest.filtrarMarcaMultiples` | Dos Seat y un Ford | listarPorMarca Seat | Exactamente A1 y A2 |
-| `AmpliacionTest.filtrarReparacionesVehiculoMultiples` | Dos reparaciones de A y una de B | buscarPorVehiculo A | Exactamente las dos reparaciones de A |
-| `AmpliacionTest.filtrarReparacionesMecanicoMultiples` | Dos reparaciones de A y una de B | buscarPorMecanico A | Exactamente las dos reparaciones de A |
-| `AmpliacionTest.filtrarPendientesMultiples` | Dos pendientes, una en proceso y otra finalizada | listarPendientes | Exactamente los dos IDs pendientes |
-| `AmpliacionTest.filtrarPiezasMultiples` | Dos piezas de A y una de B | listarPorReparacion A | Exactamente los dos IDs de piezas de A |
-| `AmpliacionTest.costeVariasPiezas` | Piezas: 2 × 10 y 3 × 5 | calcularCostePiezas | 35 |
-| `AmpliacionTest.costeDecimal` | Piezas: 2 × 10.25 y 3 × 0.10 | calcularCostePiezas | 20.80, comparación numérica |
-| `AmpliacionTest.costeSinPiezas` | Reparación sin piezas | calcularCostePiezas | 0, no null |
-| `AmpliacionTest.costeExcluyeOtraReparacion` | Reparación A con coste 6 y B con coste 100 | calcularCostePiezas A | 6; excluye los 100 de B |
-| `AmpliacionTest.idsGeneradosDistintos` | Dos clientes con correos diferentes | Insertar y recuperar ambos IDs | IDs positivos distintos y datos correspondientes |
-| `AmpliacionTest.relacionConIdNoUno` | Cliente previo y segundo cliente | Asociar vehículo al segundo cliente | Inserción 1 y propietario igual al ID obtenido, distinto de 1 |
-| `AmpliacionTest.basesTemporalesIndependientes` | Dos copias de plantilla | Insertar en primera y consultar ambas | Primera con 1 cliente; segunda con 0 |
+**Interpretación del último argumento:** después de insertar, la base de datos puede generar el ID; hay que devolverlo al objeto `Cliente` del dominio. **En vehículos**, cuyo ID es `matricula`, esa generación no ocurre.
 
-### Interpretación
+**Tareas de clase:** cambia el nombre de una función de mapper para ver el error de compilación, vuelve a dejarlo como estaba y explica por qué el compilador garantiza la compatibilidad entre `T` y `E`.
 
-Resultado exigido: **90 ejecutadas, 0 fallos, 0 errores y 0 omitidas**. Las nuevas pruebas de modificación vuelven a consultar la BBDD para comprobar la persistencia. Los filtros comprueban tanto el tamaño como el conjunto exacto de identificadores. Los importes se comparan con `compareTo`, sin exigir una escala concreta.
+## H. Consultas específicas: receta completa para crear cada método
 
-Los casos de referencias inexistentes y borrado restringido pertenecen a la investigación opcional de integridad y no se contabilizan ni se ejecutan en la suite obligatoria. El contrato de un fallo de apertura de `ConexionBD` es lanzar `SQLException`; los DAO la gestionan y devuelven su valor de respaldo.
+**Secuencia común para todas las consultas:**
+
+1. Expresa la pregunta en lenguaje natural: «¿qué reparaciones hizo este mecánico?».
+2. Identifica la entidad resultado: `ReparacionEntity`.
+3. Elige el atributo para filtrar: `idMecanico` o la ruta `mecanico.idMecanico`.
+4. Redacta el JPQL con un parámetro `:id` (no concatenes valores recibidos del usuario).
+5. Ejecuta con `createQuery(jpql, ReparacionEntity.class)` y `setParameter`.
+6. Obtén la lista y convierte cada entidad a `Reparacion` **antes** de cerrar el gestor.
+7. Comprueba resultados para ID existente, ID sin coincidencias y entrada inválida.
+
+### H.1. Buscar vehículos de un cliente
+
+```java
+public List<Vehiculo> buscarPorCliente(Integer idCliente) {
+    return read(em -> em.createQuery(
+            "select v from VehiculoEntity v where v.idCliente = :id " +
+            "order by v.matricula", VehiculoEntity.class)
+        .setParameter("id", idCliente)
+        .getResultStream()
+        .map(VehiculoMapper::toDomain)
+        .toList());
+}
+```
+
+**Traducción mental a SQL:** `SELECT ... FROM vehiculos WHERE id_cliente = ? ORDER BY matricula`. JPQL selecciona **entidades y sus propiedades Java**; Hibernate usa las anotaciones para construir el SQL real.
+
+### H.2. Buscar reparaciones por estado parametrizado
+
+```java
+public List<Reparacion> buscarPorEstado(String estado) {
+    return read(em -> em.createQuery(
+            "select r from ReparacionEntity r where r.estado = :estado " +
+            "order by r.idReparacion", ReparacionEntity.class)
+        .setParameter("estado", estado)
+        .getResultStream()
+        .map(ReparacionMapper::toDomain)
+        .toList());
+}
+```
+
+¿Por qué mejor que una consulta fija para «PENDIENTE»? Un solo método resuelve varios estados. **Validar** el conjunto de estados permitidos corresponde a la capa de servicio o dominio, no a concatenar SQL.
+
+### H.3. Consulta con `JOIN`: reparaciones de una especialidad
+
+```java
+public List<Reparacion> buscarPorEspecialidad(String especialidad) {
+    return read(em -> em.createQuery(
+            "select r from ReparacionEntity r " +
+            "join r.mecanico m where m.especialidad = :esp " +
+            "order by r.idReparacion", ReparacionEntity.class)
+        .setParameter("esp", especialidad)
+        .getResultStream()
+        .map(ReparacionMapper::toDomain)
+        .toList());
+}
+```
+
+`join r.mecanico m` usa el **atributo de relación**, que ya sabe qué columna FK une ambas tablas. `join` sirve para filtrar; **no equivale** a cargar todos los datos asociados para usarlos después de cerrar el gestor.
+
+### H.4. `JOIN FETCH` para evitar un acceso diferido fuera del gestor
+
+```java
+ReparacionEntity r = em.createQuery(
+    "select r from ReparacionEntity r " +
+    "join fetch r.vehiculo where r.idReparacion = :id",
+    ReparacionEntity.class)
+    .setParameter("id", id)
+    .getResultStream().findFirst().orElse(null);
+```
+
+**Ejercicio:** intenta acceder a `r.getVehiculo().getMarca()` dentro y fuera del gestor, con y sin `fetch`. La conclusión debe describir el contexto de persistencia y el proxy diferido, no simplemente memorizar la excepción. Si existen reparaciones sin vehículo válido, un `join` interno las excluiría; analiza si necesitas `left join fetch`.
+
+### H.5. Contar sin cargar filas enteras
+
+```java
+long total = em.createQuery(
+    "select count(r) from ReparacionEntity r where r.idMecanico = :id",
+    Long.class).setParameter("id", idMecanico).getSingleResult();
+```
+
+**Ventaja:** para contar, el motor de datos realiza la agregación; no se materializan todas las reparaciones en Java. El tipo del resultado de `count` es `Long`.
+
+### H.6. Ordenación y paginación estables
+
+```java
+List<ReparacionEntity> pagina = em.createQuery(
+        "select r from ReparacionEntity r order by r.idReparacion",
+        ReparacionEntity.class)
+    .setFirstResult(20) // saltar 20 registros: tercera página de tamaño 10
+    .setMaxResults(10)
+    .getResultList();
+```
+
+Nunca pagines sin `order by` estable: las filas no tienen orden implícito. `setFirstResult` empieza en cero; página 0: desplazamiento 0, página 1: 10 y página 2: 20.
+
+### H.7. Calcular el coste de piezas con precisión
+
+```java
+BigDecimal total = piezas.stream()
+    .map(p -> p.getPrecioUnitario()
+        .multiply(BigDecimal.valueOf(p.getCantidad())))
+    .reduce(BigDecimal.ZERO, BigDecimal::add);
+```
+
+`BigDecimal.ZERO` es el resultado correcto para una reparación sin piezas. Evita `new BigDecimal(0.1)` y prefiere `new BigDecimal("0.10")` cuando crees valores decimales literales. Una ampliación es obtener el total mediante JPQL con `sum`, pero debes ensayar qué tipo devuelve Hibernate con SQLite antes de asumir `BigDecimal`.
+
+### H.8. Ejercicio de diagnóstico de consultas
+
+Para cada consulta, escribe la entidad resultado, el parámetro, el posible SQL y el método Java esperado:
+
+```jpql
+select v from VehiculoEntity v where v.cliente.email = :email
+select r from ReparacionEntity r where r.vehiculo.matricula = :matricula
+select p from PiezaReparacionEntity p where p.idReparacion = :id
+select count(r) from ReparacionEntity r where r.estado = :estado
+```
+
+**Cuestión:** ¿en qué casos basta filtrar por `idCliente`, `matricula` o `idReparacion` sin navegar asociaciones? Argumenta la diferencia entre filtrar por clave y filtrar por atributos de otra tabla.
+
+## I. Caso completo: registrar reparación y piezas en UNA transacción
+
+Los repositorios base abren un `EntityManager` y una transacción por método. Si se llama `repoReparacion.create(...)` y después falla `repoPieza.create(...)`, la reparación podría quedar guardada. La solución para una operación de negocio atómica es agrupar las inserciones dentro del mismo contexto.
+
+```java
+public Integer registrarReparacionConPiezas(
+        EntityManagerFactory factory,
+        Reparacion reparacion,
+        List<PiezaReparacion> piezas) {
+
+    try (EntityManager em = factory.createEntityManager()) {
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+
+            // Deben existir antes de la operación; no se crean aquí.
+            if (em.find(VehiculoEntity.class, reparacion.getMatricula()) == null) {
+                throw new IllegalArgumentException("Vehículo inexistente");
+            }
+            if (em.find(MecanicoEntity.class, reparacion.getIdMecanico()) == null) {
+                throw new IllegalArgumentException("Mecánico inexistente");
+            }
+
+            ReparacionEntity entidad = ReparacionMapper.toEntity(reparacion);
+            em.persist(entidad);
+            em.flush(); // permite recuperar el ID generado
+            Integer id = entidad.getIdReparacion();
+
+            for (PiezaReparacion pieza : piezas) {
+                PiezaReparacionEntity e = PiezaReparacionMapper.toEntity(pieza);
+                e.setIdReparacion(id); // FK escalar: es la que escribe la BD
+                em.persist(e);
+            }
+
+            tx.commit();
+            reparacion.setIdReparacion(id);
+            return id;
+        } catch (RuntimeException ex) {
+            if (tx.isActive()) tx.rollback();
+            throw ex;
+        }
+    }
+}
+```
+
+Este código requiere los imports de `modelo`, `orm.entity`, `orm.mapper`, `jakarta.persistence` y `java.util.List`. Debes ubicarlo en una **clase de servicio**, no como método suelto; el `EntityManagerFactory` se proporciona desde la composición de la aplicación.
+
+**Traza esperada:** `begin → comprobar vehículo/mecánico → persist reparación → flush → persist piezas → commit`. Si una operación falla: `rollback` y ninguna inserción de esa transacción queda confirmada.
+
+**Actividad experimental:** introduce una pieza que viole una restricción de la tabla y comprueba que no se guarda la reparación. Para confirmar atomicidad, consulta los datos después del fallo usando un **nuevo** `EntityManager`.
+
+## J. Pruebas ORM independientes del JDBC heredado
+
+Las pruebas JDBC existentes no prueban por sí solas los nuevos repositorios. Añade pruebas dedicadas a `orm/repository` que utilicen una base de datos de prueba **aislada**. No ejecutes operaciones destructivas sobre `datos/taller.sqlite3`.
+
+```java
+@Test
+void debeEncontrarVehiculosDeUnCliente() {
+    // Preparar un EntityManagerFactory apuntando a una BD temporal
+    // con el mismo esquema que la BD de trabajo.
+    // Crear un cliente y dos vehículos, todos en esa BD de prueba.
+    // Invocar buscarPorCliente(idCliente).
+    // Afirmar que devuelve exactamente esas dos matrículas.
+}
+```
+
+Este pseudotest señala deliberadamente el **arranque necesario**: la configuración de la fábrica debe apuntar a un archivo temporal con esquema inicializado, no a la base de datos de producción o entregada. El `hbm2ddl.auto=none` significa que el alumno debe preparar las tablas antes del test.
+
+Pruebas concretas para implementar:
+
+| Prueba | Preparación | Resultado esperado |
+|---|---|---|
+| `createCliente` | Cliente sin ID | ID generado y fila consultable |
+| `findByIdInexistente` | ID que no existe | `Optional.empty()` |
+| `updateCliente` | Cliente previamente guardado | Cambios persistidos en otra sesión |
+| `deleteCliente` | Cliente sin vehículos | La fila desaparece |
+| `buscarVehiculosCliente` | 2 vehículos de A, 1 de B | 2 para A |
+| `listarPendientes` | Varios estados | Solo `PENDIENTE` |
+| `reparacionConPiezas` | Reparación + dos piezas | Todo confirmado o todo revertido |
+| `costePiezas` | 2 × 10.50 y 3 × 4.00 | `33.00` numéricamente |
+
+Para importes `BigDecimal`, considera `compareTo` o una comparación numérica apropiada, porque `equals` también distingue la escala decimal (`33.0` y `33.00`).
+
+**Comandos de validación:**
+
+```bash
+mvn clean compile
+mvn test
+mvn -DskipTests package
+```
+
+Si Maven falla, adjunta el mensaje completo, distingue error de compilación, configuración ORM y restricción SQL, y localiza el archivo responsable antes de cambiar anotaciones al azar.
+
+## K. Guía de resolución de incidencias con razonamiento
+
+| Síntoma | Causa frecuente | Comprobación / solución |
+|---|---|---|
+| `No Persistence provider` | XML, dependencias o nombre incorrecto | Revisa `META-INF/persistence.xml` y `tallerPU` |
+| `Unknown entity` | Clase sin `@Entity` o mal registrada | Verifica las cinco entidades y el paquete |
+| `no such table` | URL apunta a otra SQLite o esquema no inicializado | Imprime/inspecciona la URL real de la fábrica |
+| `no such column` | `@Column` no refleja el DDL | Consulta `PRAGMA table_info(...)` |
+| `LazyInitializationException` | Se navega por una asociación después de cerrar `em` | Consulta/proyecta datos mientras el gestor esté abierto o usa `join fetch` pertinente |
+| `TransactionRequiredException` | Escritura sin transacción | Usa `begin`, `commit`, `rollback` |
+| `detached entity passed to persist` | Se intenta insertar algo que no es nuevo | Distingue `persist` de la actualización mediante entidad administrada/`merge` |
+| FK sin actualizar | Se cambió solo una asociación de lectura | Actualiza el campo `idCliente`, `idMecanico`, etc. |
+| Diferencias en dinero | `double`, escala `BigDecimal` | Usa `BigDecimal` y pruebas numéricas |
+| Pruebas que alteran datos reales | Se reutilizó la BD entregada | Crea fichero SQLite temporal y prepara esquema independiente |
+
+## L. Entrega por hitos y criterios de evaluación
+
+- **Hito 1 — Base relacional:** esquema documentado con PK, FK y cardinalidades; consulta SQL de cada tabla.
+- **Hito 2 — Entidades:** cinco clases anotadas, identificadores correctos y todas las columnas verificadas.
+- **Hito 3 — Relaciones:** cuatro asociaciones `ManyToOne` explicadas; justificación de la FK escalar y la asociación de lectura.
+- **Hito 4 — Configuración:** `pom.xml`, `persistence.xml` y `OrmFactory` explicados; conexión comprobada.
+- **Hito 5 — Repositorio:** `IRepository`, mappers, CRUD y transacciones; ID generado de cliente devuelto correctamente.
+- **Hito 6 — Consultas:** búsqueda por cliente, estado, especialidad; al menos un `join`, un `count` y una página estable.
+- **Hito 7 — Servicio atómico:** reparación con dos piezas, rollback de una operación fallida y consulta posterior.
+- **Hito 8 — Pruebas y memoria:** comandos, capturas o salidas de tests, explicaciones y decisiones justificadas.
+
+**Preguntas para la defensa oral:** ¿qué diferencia hay entre clase de dominio y entidad? ¿Por qué `EntityManagerFactory` se comparte pero `EntityManager` no? ¿Qué diferencia hay entre `flush` y `commit`? ¿Por qué `merge` devuelve una instancia? ¿En qué tabla está cada FK? ¿Qué sucede si modificas solo una asociación con `updatable=false`? ¿Por qué `JOIN FETCH` no debería aplicarse indiscriminadamente? ¿Por qué una transacción por método de repositorio no basta para un caso de uso de varios pasos?
+
+**Regla final del laboratorio:** entrega código comprensible y comprobable. El objetivo no es memorizar anotaciones: es poder explicar cómo un objeto Java acaba representado por una fila SQL y cómo proteger la integridad de sus relaciones.
