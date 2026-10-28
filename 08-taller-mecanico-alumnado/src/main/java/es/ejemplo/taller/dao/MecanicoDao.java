@@ -28,7 +28,13 @@ public class MecanicoDao extends AbstractDao<Mecanico, Integer> {
 
     public List<Mecanico> listar() {
         String query = "SELECT id_mecanico, nombre, especialidad, tarifa_hora FROM mecanicos";
-        return mapper(findAll(query, url));
+        ResultSet rs = null;
+        try {
+            rs = findAll(query, url);
+            return mapper(rs);
+        } finally {
+            closeConnection(rs);
+        }
     }
 
     public Optional<Mecanico> buscarPorId(Integer id) {

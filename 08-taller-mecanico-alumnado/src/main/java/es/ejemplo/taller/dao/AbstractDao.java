@@ -44,6 +44,24 @@ public class AbstractDao<T, ID>{
     }
 
     // Estilo 2
+
+    /**
+     * Los métodos del DAO abstracto no pueden cerrar la conexión porque el ResultSet
+     * se usará en los DAO hijos, por eso este metodo se usara en los hijos
+     * una vez se haya terminado de usar el ResultSet
+     * @param rs ResultSet perteneciente a la conexion que se desea cerrar
+     */
+    void closeConnection(ResultSet rs) {
+        try {
+            Connection c = rs.getStatement().getConnection();
+            rs.getStatement().close();
+            rs.close();
+            c.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     ResultSet findAll(String query, String url) {
         try {
             Connection c = ConexionBD.abrir(url);
