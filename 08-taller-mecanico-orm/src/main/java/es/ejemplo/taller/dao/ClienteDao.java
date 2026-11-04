@@ -1,98 +1,115 @@
 package es.ejemplo.taller.dao;
-import es.ejemplo.taller.infra.ConexionBD;
-import es.ejemplo.taller.modelo.Cliente;
 
-import javax.xml.transform.Result;
+import es.ejemplo.taller.modelo.Cliente;
+import es.ejemplo.taller.orm.config.OrmFactory;
+import es.ejemplo.taller.orm.entity.ClienteEntity;
+import es.ejemplo.taller.orm.mapper.ClienteMapper;
+import jakarta.persistence.EntityManagerFactory;
+
 import java.sql.*;
 import java.util.*;
 import java.math.BigDecimal;
-public class ClienteDao extends AbstractDao<Cliente, Integer> {
+
+public class ClienteDao {
     private final String url;
-    public ClienteDao(String url) { this.url = url; }
+    private final EntityManagerFactory managerFactory;
 
-    public List<Cliente> mapper(ResultSet rs) {
-        List<Cliente> lista = new ArrayList<>();
-        try {
-            while(rs.next()){
-                lista.add( new Cliente(rs.getInt(1),
-                                        rs.getString(2),
-                                        rs.getString(3),
-                                        rs.getString(4))
-                );
-            }
-
-            return lista;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public ClienteDao(String url) {
+        this.url = url;
+        managerFactory = OrmFactory.crear(url);
     }
 
     public List<Cliente> listar() {
-        String query = "SELECT id_cliente, nombre, email, telefono FROM clientes";
-
-        try (Connection c = ConexionBD.abrir(url);){
-            PreparedStatement ps = c.prepareStatement(query);
-            return mapper(find(ps));
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        try (var em = managerFactory.createEntityManager()) {
+            return em.createQuery(
+                            "select c from ClienteEntity c order by c.nombre",
+                            ClienteEntity.class)
+                    .getResultStream()
+                    .map(ClienteMapper::toDomain)
+                    .toList();
         }
     }
+
     public Optional<Cliente> buscarPorId(Integer id) {
-        String query = "SELECT id_cliente, nombre, email, telefono FROM clientes WHERE id_cliente = ?";
-
-        try (Connection c = ConexionBD.abrir(url);){
-            PreparedStatement ps = c.prepareStatement(query);
-            ps.setInt(1, id);
-            return mapper(find(ps)).stream().findFirst();
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        try (var em = managerFactory.createEntityManager()) {
+            return Optional.ofNullable(em.find(ClienteEntity.class, id))
+                    .map(ClienteMapper::toDomain);
         }
     }
-    public int insertar(Cliente dato) {
-        if(dato == null || dato.getNombre() == null || dato.getNombre().isBlank()) return 0;
 
-        String query = "INSERT INTO clientes (nombre, email, telefono) VALUES (?, ?, ?)";
-
-        try (Connection c = ConexionBD.abrir(url);){
-            PreparedStatement ps = c.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, dato.getNombre());
-            ps.setString(2, dato.getEmail());
-            ps.setString(3, dato.getTelefono());
-
-            return insert(ps);
-
-        } catch (SQLException e) {
-            return 0;
+    public Optional<Cliente> buscarPorEmail(String email) {
+        try (var em = managerFactory.createEntityManager()) {
+            return em.createQuery(
+                            "select v from VehiculoEntity v where v.idCliente = :id",
+                            ClienteEntity.class)
+                    .setParameter("id", email)
+                    .getResultStream()
+                    .map(ClienteMapper::toDomain).findFirst();
         }
     }
-    public int actualizar(Cliente dato) {
-        String query = "UPDATE clientes SET nombre = ?, email = ?, telefono= ? WHERE id_cliente = ?";
 
-        try (Connection c = ConexionBD.abrir(url);){
-            PreparedStatement ps = c.prepareStatement(query);
-            ps.setString(1, dato.getNombre());
-            ps.setString(2, dato.getEmail());
-            ps.setString(3, dato.getTelefono());
-            ps.setInt(4, dato.getIdCliente());
+    public int insertar(Cliente cliente) {
+        if (cliente == null) return 0;
 
-            return create(ps);
+        try (var em = managerFactory.createEntityManager()) {
+            var tx = em.getTransaction();
+            try {
+                tx.begin();
+                ClienteEntity entidad = ClienteMapper.toEntity(cliente);
+                em.persist(entidad);
+                em.flush(); // Necesario aquí para leer inmediatamente el ID generado
+                cliente.setIdCliente(entidad.getIdCliente());
+                tx.commit();
+                return cliente.getIdCliente();
+            } catch (RuntimeException ex) {
+                if (tx.isActive()) tx.rollback();
+                return 0;
+            }
+        }
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+    }
+
+    public int actualizar(Cliente cliente) {
+        try (var em = managerFactory.createEntityManager()) {
+            var tx = em.getTransaction();
+            try {
+                tx.begin();
+                ClienteEntity c = em.find(ClienteEntity.class, cliente.getIdCliente());
+                if (c == null) {
+                    tx.commit();
+                    return 0;
+                }
+                ClienteEntity clienteEntityActualizado = ClienteMapper.toEntity(cliente);
+                c.setNombre(clienteEntityActualizado.getNombre());
+                c.setEmail(clienteEntityActualizado.getEmail());
+                c.setTelefono(clienteEntityActualizado.getTelefono());
+                tx.commit(); // Hibernate detecta el cambio
+                return 1;
+            } catch (RuntimeException ex) {
+                if (tx.isActive()) tx.rollback();
+                throw ex;
+            }
         }
     }
+
     public int eliminar(Integer id) {
-        String query = "DELETE FROM clientes WHERE id_cliente = ?";
 
-        try (Connection c = ConexionBD.abrir(url);){
-            PreparedStatement ps = c.prepareStatement(query);
-            ps.setInt(1, id);
-
-            return create(ps);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        try (var em = managerFactory.createEntityManager()) {
+            var tx = em.getTransaction();
+            try {
+                tx.begin();
+                ClienteEntity c = em.find(ClienteEntity.class, id);
+                if (c == null) {
+                    tx.commit();
+                    return 0;
+                }
+                em.remove(c);
+                tx.commit();
+                return 1;
+            } catch (RuntimeException ex) {
+                if (tx.isActive()) tx.rollback();
+                throw ex;
+            }
         }
     }
 }
