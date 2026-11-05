@@ -38,14 +38,14 @@ public class ClienteDao {
     }
 
     public Optional<Cliente> buscarPorEmail(String email) {
-        try (var em = managerFactory.createEntityManager()) {
-            return em.createQuery(
-                            "select v from VehiculoEntity v where v.idCliente = :id",
-                            ClienteEntity.class)
-                    .setParameter("id", email)
-                    .getResultStream()
-                    .map(ClienteMapper::toDomain).findFirst();
-        }
+            try (var em = managerFactory.createEntityManager()) {
+                return em.createQuery(
+                                "select v from VehiculoEntity v where v.idCliente = :id",
+                                ClienteEntity.class)
+                        .setParameter("id", email)
+                        .getResultStream()
+                        .map(ClienteMapper::toDomain).findFirst();
+            }
     }
 
     public int insertar(Cliente cliente) {

@@ -1,12 +1,25 @@
 package es.ejemplo.taller.dao;
 import es.ejemplo.taller.infra.ConexionBD;
 import es.ejemplo.taller.modelo.Vehiculo;
+import es.ejemplo.taller.orm.config.OrmFactory;
+import es.ejemplo.taller.orm.entity.ClienteEntity;
+import es.ejemplo.taller.orm.entity.VehiculoEntity;
+import es.ejemplo.taller.orm.mapper.ClienteMapper;
+import es.ejemplo.taller.orm.mapper.VehiculoMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+
 import java.sql.*;
 import java.util.*;
 import java.math.BigDecimal;
 public class VehiculoDao extends AbstractDao<Vehiculo, String> {
     private final String url;
-    public VehiculoDao(String url) { this.url = url; }
+    private final EntityManagerFactory managerFactory;
+    public VehiculoDao(String url) {
+        this.url = url;
+        this.managerFactory = OrmFactory.crear(url);
+    }
 
     public List<Vehiculo> mapper(ResultSet rs) {
         List<Vehiculo> lista = new ArrayList<>();
@@ -27,46 +40,40 @@ public class VehiculoDao extends AbstractDao<Vehiculo, String> {
     }
 
     public List<Vehiculo> listar() {
-        String query = "SELECT matricula, marca, modelo, anio, id_cliente FROM vehiculos";
-
-        try (Connection c = ConexionBD.abrir(url);){
-            PreparedStatement ps = c.prepareStatement(query);
-            return mapper(find(ps));
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        try (var em = managerFactory.createEntityManager()) {
+            return em.createQuery(
+                            "select v from VehiculoEntity v order by v.matricula",
+                            VehiculoEntity.class)
+                    .getResultStream()
+                    .map(VehiculoMapper::toDomain)
+                    .toList();
         }
     }
     public Optional<Vehiculo> buscarPorId(String id) {
-        String query = "SELECT matricula, marca, modelo, anio, id_cliente FROM vehiculos WHERE matricula = ?";
-
-        try (Connection c = ConexionBD.abrir(url);){
-            PreparedStatement ps = c.prepareStatement(query);
-            ps.setString(1, id);
-            return mapper(find(ps)).stream().findFirst();
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        try (var em = managerFactory.createEntityManager()) {
+            return Optional.ofNullable(em.find(VehiculoEntity.class, id))
+                    .map(VehiculoMapper::toDomain);
         }
     }
-    public int insertar(Vehiculo dato) {
-        if(dato == null || dato.getMatricula() == null || dato.getMatricula().isBlank()) return 0;
+    public int insertar(Vehiculo vehiculo) {
+        if (vehiculo == null) return 0;
 
-        String query = "INSERT INTO vehiculos (matricula, marca, modelo, anio, id_cliente) VALUES (?, ?, ?, ?, ?)";
-
-        try (Connection c = ConexionBD.abrir(url);){
-            PreparedStatement ps = c.prepareStatement(query);
-            ps.setString(1, dato.getMatricula());
-            ps.setString(2, dato.getMarca());
-            ps.setString(3, dato.getModelo());
-            ps.setInt(4, dato.getAnio());
-            ps.setInt(5, dato.getIdCliente());
-
-            return create(ps);
-
-        } catch (SQLException e) {
-            return 0;
+        try (var em = managerFactory.createEntityManager()) {
+            var tx = em.getTransaction();
+            try {
+                tx.begin();
+                VehiculoEntity entidad = VehiculoMapper.toEntity(vehiculo);
+                em.persist(entidad);
+                em.flush(); // Necesario aquí para leer inmediatamente el ID generado
+                vehiculo.setMatricula(entidad.getMatricula());
+                tx.commit();
+                return 1;
+            } catch (RuntimeException ex) {
+                if (tx.isActive()) tx.rollback();
+                return 0;
+            }
         }
+
     }
     public int actualizar(Vehiculo dato) {
         String query = "UPDATE vehiculos SET marca = ?, modelo = ?, anio = ?, id_cliente = ? WHERE matricula = ?";
@@ -97,28 +104,26 @@ public class VehiculoDao extends AbstractDao<Vehiculo, String> {
             throw new RuntimeException(e);
         }
     }
-    public List<Vehiculo> buscarPorCliente(Integer idCliente) {
-        String query = "SELECT matricula, marca, modelo, anio, id_cliente FROM vehiculos WHERE id_cliente = ?";
 
-        try (Connection c = ConexionBD.abrir(url);){
-            PreparedStatement ps = c.prepareStatement(query);
-            ps.setInt(1, idCliente);
-            return mapper(find(ps));
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+    public List<Vehiculo> buscarPorCliente(Integer id) {
+        try (var em = managerFactory.createEntityManager()) {
+            return em.createQuery(
+                            "select v from VehiculoEntity v where v.idCliente = :id",
+                            VehiculoEntity.class)
+                    .setParameter("id", id)
+                    .getResultStream()
+                    .map(VehiculoMapper::toDomain).toList();
         }
     }
+
     public List<Vehiculo> listarPorMarca(String marca) {
-        String query = "SELECT matricula, marca, modelo, anio, id_cliente FROM vehiculos WHERE marca = ?";
-
-        try (Connection c = ConexionBD.abrir(url);){
-            PreparedStatement ps = c.prepareStatement(query);
-            ps.setString(1, marca);
-            return mapper(find(ps));
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        try (var em = managerFactory.createEntityManager()) {
+            return em.createQuery(
+                            "select v from VehiculoEntity v where v.marca = :marca",
+                            VehiculoEntity.class)
+                    .setParameter("id", marca)
+                    .getResultStream()
+                    .map(VehiculoMapper::toDomain).toList();
         }
     }
 }
