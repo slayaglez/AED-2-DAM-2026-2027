@@ -75,21 +75,26 @@ public class VehiculoDao extends AbstractDao<Vehiculo, String> {
         }
 
     }
-    public int actualizar(Vehiculo dato) {
-        String query = "UPDATE vehiculos SET marca = ?, modelo = ?, anio = ?, id_cliente = ? WHERE matricula = ?";
-
-        try (Connection c = ConexionBD.abrir(url);){
-            PreparedStatement ps = c.prepareStatement(query);
-            ps.setString(1, dato.getMarca());
-            ps.setString(2, dato.getModelo());
-            ps.setInt(3, dato.getAnio());
-            ps.setInt(4, dato.getIdCliente());
-            ps.setString(5, dato.getMatricula());
-
-            return create(ps);
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+    public int actualizar(Vehiculo vehiculo) {
+        try (var em = managerFactory.createEntityManager()) {
+            var tx = em.getTransaction();
+            try {
+                tx.begin();
+                VehiculoEntity v = em.find(VehiculoEntity.class, vehiculo.getMatricula());
+                if (v == null) {
+                    tx.commit();
+                    return 0;
+                }
+                VehiculoEntity vehiculoEntityActualizado = VehiculoMapper.toEntity(vehiculo);
+                v.setMarca(vehiculoEntityActualizado.getMarca());
+                v.setModelo(vehiculoEntityActualizado.getModelo());
+                v.setAnio(vehiculoEntityActualizado.getAnio());
+                tx.commit(); // Hibernate detecta el cambio
+                return 1;
+            } catch (RuntimeException ex) {
+                if (tx.isActive()) tx.rollback();
+                throw ex;
+            }
         }
     }
     public int eliminar(String id) {
@@ -121,7 +126,7 @@ public class VehiculoDao extends AbstractDao<Vehiculo, String> {
             return em.createQuery(
                             "select v from VehiculoEntity v where v.marca = :marca",
                             VehiculoEntity.class)
-                    .setParameter("id", marca)
+                    .setParameter("marca", marca)
                     .getResultStream()
                     .map(VehiculoMapper::toDomain).toList();
         }
