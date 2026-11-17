@@ -1,7 +1,10 @@
-package aula.tareas;
+package aula.tareas.controller;
 
 import java.net.URI;
 import java.util.List;
+
+import aula.tareas.service.TareaService;
+import aula.tareas.modelo.Tarea;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/tareas")
-class TareaController {
+public class TareaController {
     private final TareaService servicio;
 
     TareaController(TareaService servicio) {
