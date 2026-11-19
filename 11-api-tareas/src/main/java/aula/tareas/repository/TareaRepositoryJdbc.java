@@ -83,13 +83,18 @@ public class TareaRepositoryJdbc implements ITareaRepository {
         String query = "INSERT INTO tareas_jdbc (titulo) VALUES (?)";
 
         try (Connection c = DriverManager.getConnection(jdbcUrl);
-             PreparedStatement ps = c.prepareStatement(query);
-             ) {
+             PreparedStatement ps = c.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, titulo);
             ps.executeUpdate();
 
-        } catch (SQLException e){
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    long idGenerado = keys.getLong(1);
+                    return new TareaRequest(idGenerado, titulo);
+                }
+            }
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return null;
