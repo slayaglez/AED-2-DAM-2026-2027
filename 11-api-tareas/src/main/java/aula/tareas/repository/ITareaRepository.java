@@ -1,13 +1,13 @@
 package aula.tareas.repository;
 
-import aula.tareas.modelo.Tarea;
+import aula.tareas.api.TareaRequest;
 
 import java.util.List;
 
 public interface ITareaRepository {
-    public Tarea findById(long id);
-    public List<Tarea> findAll();
-    public Tarea create(String titulo);
+    public TareaRequest findById(long id);
+    public List<TareaRequest> findAll();
+    public TareaRequest create(String titulo);
     public boolean delete(long id);
-    public Tarea update(Tarea tarea);
+    public TareaRequest update(TareaRequest tareaRequest);
 }

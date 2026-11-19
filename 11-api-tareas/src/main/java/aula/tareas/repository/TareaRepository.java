@@ -1,40 +1,40 @@
 package aula.tareas.repository;
 
-import aula.tareas.modelo.Tarea;
+import aula.tareas.api.TareaRequest;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-@Repository()
+@Repository("tareaRepository")
 public class TareaRepository implements ITareaRepository {
     private final AtomicLong secuencia = new AtomicLong();
-    private final ConcurrentSkipListMap<Long, Tarea> tareas = new ConcurrentSkipListMap<>();
+    private final ConcurrentSkipListMap<Long, TareaRequest> tareas = new ConcurrentSkipListMap<>();
 
-    public List<Tarea> findAll() {
+    public List<TareaRequest> findAll() {
         return List.copyOf(tareas.values());
     }
 
-    public Tarea findById(long id) {
+    public TareaRequest findById(long id) {
         return tareas.get(id);
     }
 
-    public Tarea create(String titulo) {
+    public TareaRequest create(String titulo) {
         long id = secuencia.incrementAndGet();
-        var tarea = new Tarea(id, titulo.strip());
+        var tarea = new TareaRequest(id, titulo.strip());
         tareas.put(id, tarea);
         return tarea;
     }
 
-    public Tarea update(Tarea tarea){
-        Tarea oldTarea = findById(tarea.id());
-        if(oldTarea == null) return null;
+    public TareaRequest update(TareaRequest tareaRequest){
+        TareaRequest oldTareaRequest = findById(tareaRequest.getId());
+        if(oldTareaRequest == null) return null;
         return null;
     }
 
     public boolean delete(long id) {
-        Tarea deleted = tareas.remove(id);
+        TareaRequest deleted = tareas.remove(id);
         return deleted != null;
     }
 

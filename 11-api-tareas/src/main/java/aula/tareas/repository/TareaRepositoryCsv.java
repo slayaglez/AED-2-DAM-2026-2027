@@ -1,12 +1,14 @@
 package aula.tareas.repository;
 
-import aula.tareas.modelo.Tarea;
+import aula.tareas.api.TareaRequest;
 import org.apache.commons.csv.CSVFormat;
+import org.springframework.stereotype.Repository;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+@Repository("tareaRepositoryCsv")
 public class TareaRepositoryCsv implements ITareaRepository {
 
     private Path path;
@@ -23,18 +25,18 @@ public class TareaRepositoryCsv implements ITareaRepository {
     }
 
     @Override
-    public Tarea findById(long id) {
+    public TareaRequest findById(long id) {
         return null;
     }
 
     @Override
-    public List<Tarea> findAll() {
+    public List<TareaRequest> findAll() {
         if(Files.notExists(path)) return List.of();
         return null;
     }
 
     @Override
-    public Tarea create(String titulo) {
+    public TareaRequest create(String titulo) {
         return null;
     }
 
@@ -44,7 +46,7 @@ public class TareaRepositoryCsv implements ITareaRepository {
     }
 
     @Override
-    public Tarea update(Tarea tarea) {
+    public TareaRequest update(TareaRequest tareaRequest) {
         return null;
     }
 }

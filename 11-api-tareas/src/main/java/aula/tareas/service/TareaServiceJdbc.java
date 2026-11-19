@@ -1,34 +1,37 @@
 package aula.tareas.service;
 
-import java.util.List;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.atomic.AtomicLong;
-
-import aula.tareas.modelo.Tarea;
+import aula.tareas.api.TareaRequest;
 import aula.tareas.repository.ITareaRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-@Service
-public class TareaService {
+import java.util.List;
+
+@Service("tareaServiceJdbc")
+public class TareaServiceJdbc implements ITareaService {
     private final ITareaRepository repository;
 
-    public TareaService(ITareaRepository repository) {
+    public TareaServiceJdbc(@Qualifier("tareaRepositoryJdbc") ITareaRepository repository) {
         this.repository = repository;
     }
 
-    public List<Tarea> listar() {
+    @Override
+    public List<TareaRequest> listar() {
         return repository.findAll();
     }
 
-    public Tarea buscar(long id) {
+    @Override
+    public TareaRequest buscar(long id) {
         return repository.findById(id);
     }
 
-    public Tarea crear(String titulo) {
+    @Override
+    public TareaRequest crear(String titulo) {
         if  (titulo == null || titulo.isBlank()) return null;
         return repository.create(titulo);
     }
 
+    @Override
     public boolean delete(long id) {
         return repository.delete(id);
     }
