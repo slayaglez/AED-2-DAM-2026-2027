@@ -60,3 +60,17 @@ Los nombres son los mismos que en el POST, en sentido inverso: de la columna `pe
 - `200`: el repositorio encuentra la fila y el servicio devuelve un `Optional` con la película.
 - `404`: no hay fila, el `Optional` está vacío y el controlador responde con un `ProblemDetail`.
 
+## Aclaración IMPORTANTE
+
+A falta de tiempo esta documentación fue generada con IA, mucha investigación y debugging se hizo también con IA, pero **ni una sola línea de código ha sido generada con IA**
+
+Cosas que no me dieron tiempo y me gustaría haber implementado:
+- Mockito, aunque lo estuve mirando no me atreví a implementarlo en los test por miedo a romper lo que ya tenía hecho.
+- Una mejor documentación, tuve que recurrir a la IA para documentar esto y me hubiera gustado redactarla yo.
+- El Profile y application.properties, me seguía dando errores y como se acercaba la entrega lo sustituí por el método que ya conocemos (DriverManager...)
+- Muchos más tests, no recuerdo como verificar la cobertura pero me hubiera gustado crear muchos más tests.
+
+También decir que vi casi al final que se pidieran commits. Por suerte todo lo que hago lo hice en un repo pero como me acostumbré a trabajar en la máquina virtual de mi disco duro externo no he hecho commits a lo largo del tiempo. Espero compensarlo haciendo commits por cada capa demostrando que me manejo bien con git y que entiendo el modelo de capas.
+
+Como siempre, seguiré trabajando en el proyecto después de la entrega.
+
