@@ -7,11 +7,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service("tareaServiceJdbc")
-public class TareaServiceJdbc implements ITareaService {
+@Service("tareaServiceOrm")
+public class TareaServiceOrm implements ITareaService {
+
     private final ITareaRepository repository;
 
-    public TareaServiceJdbc(@Qualifier("tareaRepositoryJdbc") ITareaRepository repository) {
+    public TareaServiceOrm(@Qualifier("tareaRepositoryOrm") ITareaRepository repository) {
         this.repository = repository;
     }
 

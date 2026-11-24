@@ -1,4 +1,4 @@
 package aula.tareas.model;
 
-public record Tarea() {
+public record Tarea(long id, String titulo) {
 }
