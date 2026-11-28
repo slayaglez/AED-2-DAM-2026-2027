@@ -1,5 +1,6 @@
 package aula.tareas.mapper;
 
+import aula.tareas.api.TareaRequest;
 import aula.tareas.api.TareaResponse;
 import aula.tareas.modelo.Tarea;
 

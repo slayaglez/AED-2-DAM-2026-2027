@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public abstract class AbstractTareaService implements ITareaService {
 
-    public final ITareaRepository repository;
+    private final ITareaRepository repository;
 
     public AbstractTareaService(ITareaRepository repository) {
         this.repository = repository;
@@ -40,6 +40,6 @@ public abstract class AbstractTareaService implements ITareaService {
 
     public boolean eliminar(long id) {
         if (id <= 0) return false;
-        return  repository.delete(id);
+        return repository.delete(id);
     }
 }

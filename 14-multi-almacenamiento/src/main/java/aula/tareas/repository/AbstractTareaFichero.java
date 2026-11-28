@@ -5,7 +5,6 @@ import aula.tareas.modelo.Tarea;
 import java.util.List;
 import java.util.Optional;
 
-/** CRUD compartido por los formatos de fichero, con lectura del fichero en cada operación. */
 abstract class AbstractTareaFichero implements ITareaRepository {
 
     private final List<Tarea> tareas = readAll();
@@ -35,6 +34,8 @@ abstract class AbstractTareaFichero implements ITareaRepository {
     }
 
     public synchronized boolean delete(long id) {
-        return tareas.removeIf(t -> t.identificador() == id);
+        if (!tareas.removeIf(t -> t.identificador() == id)) return false;
+        writeAll(tareas);
+        return true;
     }
 }
