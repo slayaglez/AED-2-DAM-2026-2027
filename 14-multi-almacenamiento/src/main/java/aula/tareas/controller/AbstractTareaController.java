@@ -6,11 +6,8 @@ import aula.tareas.mapper.TareaMapperApi;
 import aula.tareas.modelo.Tarea;
 import aula.tareas.service.ITareaService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.net.URI;
 import java.util.List;
 import java.util.NoSuchElementException;
