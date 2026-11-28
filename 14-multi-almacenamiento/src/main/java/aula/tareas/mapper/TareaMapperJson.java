@@ -11,6 +11,6 @@ public final class TareaMapperJson {
     }
 
     public static Tarea toDomain(TareaEntityJson entity) {
-        return new Tarea(entity.getIdTarea(), entity.getNombreTarea());
+        return new Tarea(entity.idTarea(), entity.nombreTarea());
     }
 }

@@ -8,10 +8,10 @@ public class TareaEntityOrm {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idTarea;
+    private final Long idTarea;
 
     @Column(nullable = false, length = 100)
-    private String nombreTarea;
+    private final String nombreTarea;
 
     public TareaEntityOrm(Long idTarea, String nombreTarea) {
         this.idTarea = idTarea;
@@ -22,15 +22,8 @@ public class TareaEntityOrm {
         return idTarea;
     }
 
-    public void setIdTarea(Long idTarea) {
-        this.idTarea = idTarea;
-    }
-
     public String getNombreTarea() {
         return nombreTarea;
     }
 
-    public void setNombreTarea(String nombreTarea) {
-        this.nombreTarea = nombreTarea;
-    }
 }

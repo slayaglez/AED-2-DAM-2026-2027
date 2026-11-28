@@ -11,6 +11,6 @@ public final class TareaMapperXml {
     }
 
     public static Tarea toDomain(TareaEntityXml entity) {
-        return new Tarea(entity.getIdTarea(), entity.getNombreTarea());
+        return new Tarea(entity.idTarea(), entity.nombreTarea());
     }
 }
