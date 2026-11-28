@@ -19,7 +19,6 @@ import java.util.List;
 @Repository
 @Qualifier("tareaRepositoryXml")
 public class TareaRepositoryXml extends AbstractTareaFichero {
-    private final Path path;
     private final XmlMapper mapper = XmlMapper.builder()
             .defaultUseWrapper(false)
             .build();
@@ -29,7 +28,7 @@ public class TareaRepositoryXml extends AbstractTareaFichero {
     }
 
     public TareaRepositoryXml(Path path) {
-        this.path = path;
+        super(path);
     }
 
     @JsonRootName("tareas")

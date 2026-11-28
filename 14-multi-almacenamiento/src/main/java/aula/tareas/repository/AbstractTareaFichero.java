@@ -2,15 +2,17 @@ package aula.tareas.repository;
 
 import aula.tareas.modelo.Tarea;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
 abstract class AbstractTareaFichero implements ITareaRepository {
 
-    private final List<Tarea> tareas = readAll();
+    protected final Path path;
 
-    abstract List<Tarea> readAll();
-    abstract void writeAll(List<Tarea> tareas);
+    public AbstractTareaFichero(Path path) {
+        this.path = path;
+    }
 
     public synchronized List<Tarea> findAll() {
         return readAll();
@@ -21,21 +23,27 @@ abstract class AbstractTareaFichero implements ITareaRepository {
     }
 
     public synchronized Tarea create(Tarea tarea) {
+        List<Tarea> tareas = readAll();
         tareas.add(tarea);
         writeAll(tareas);
         return tarea;
     }
 
     public synchronized Optional<Tarea> update(Tarea tarea) {
-        if(!tareas.remove(tarea)) return Optional.empty();
+        List<Tarea> tareas = readAll();
+        if (!tareas.removeIf(t -> t.identificador().equals(tarea.identificador()))) return Optional.empty();
         tareas.add(tarea);
         writeAll(tareas);
-        return Optional.ofNullable(tareas.getLast());
+        return Optional.of(tarea);
     }
 
     public synchronized boolean delete(long id) {
+        List<Tarea> tareas = readAll();
         if (!tareas.removeIf(t -> t.identificador() == id)) return false;
         writeAll(tareas);
         return true;
     }
+
+    abstract List<Tarea> readAll();
+    abstract void writeAll(List<Tarea> tareas);
 }

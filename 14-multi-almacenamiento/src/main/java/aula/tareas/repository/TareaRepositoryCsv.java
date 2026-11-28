@@ -20,14 +20,13 @@ import java.util.List;
 @Repository
 @Qualifier("tareaRepositoryCsv")
 public class TareaRepositoryCsv extends AbstractTareaFichero {
-    private final Path path;
 
     public TareaRepositoryCsv() {
         this(Path.of("data", "tarea.csv"));
     }
 
     public TareaRepositoryCsv(Path path) {
-        this.path = path;
+        super(path);
     }
 
     private static final CSVFormat ENTRADA = CSVFormat.DEFAULT.builder()

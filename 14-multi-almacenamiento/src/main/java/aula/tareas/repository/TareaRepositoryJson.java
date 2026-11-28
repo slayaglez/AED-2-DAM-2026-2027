@@ -16,7 +16,6 @@ import java.util.List;
 @Repository
 @Qualifier("tareaRepositoryJson")
 public class TareaRepositoryJson extends AbstractTareaFichero {
-    private final Path path;
     private final JsonMapper mapper;
 
     @Autowired
@@ -25,7 +24,7 @@ public class TareaRepositoryJson extends AbstractTareaFichero {
     }
 
     public TareaRepositoryJson(Path path, JsonMapper mapper) {
-        this.path = path;
+        super(path);
         this.mapper = mapper;
     }
 
